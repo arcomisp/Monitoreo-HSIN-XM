@@ -131,6 +131,11 @@ table.data th:first-child,table.data td:first-child{text-align:left;font-family:
 .obs .obs-meta{margin:0 0 10px;font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3)}
 .obs p,.obs li{font-size:14.5px;line-height:1.55;color:var(--ink-2)}
 .obs ol{margin:4px 0 10px;padding-left:22px}
+.obs-btns{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0 12px}
+.obs-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:99px;background:var(--senda);color:#fff;font-weight:600;font-size:14px;text-decoration:none}
+.obs-btn:hover{filter:brightness(1.08)}
+.obs-btn.sec{background:transparent;color:var(--ink);border:1px solid var(--rule)}
+.obs-btn.sec span{color:var(--senda)}
 .obs .obs-lec{color:var(--ink);border-top:1px solid var(--rule);padding-top:10px;margin-bottom:0}
 .dx-final{border-top:1px solid var(--rule);padding-top:12px}
 .dx-final p{color:var(--ink)}
@@ -175,7 +180,11 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
       <li>¿Por qué el período de riesgo de desabastecimiento se activó en septiembre y no en agosto?</li>
       <li>¿Cuál es el plan y el cronograma para recuperar las plantas térmicas hoy sin disponibilidad?</li>
     </ol>
-    <p>Estas preguntas se presentaron también como derecho de petición. La respuesta oficial se publicará en esta página.</p>
+    <p>Estas preguntas se presentan también como derecho de petición. La respuesta oficial se publicará completa en esta página.</p>
+    <div class="obs-btns">
+      <a class="obs-btn" href="peticiones/2026-10-09-termicas.html" data-goatcounter-click="peticion-termicas"><i class="fa-solid fa-file-lines" aria-hidden="true"></i> Leer el derecho de petición</a>
+      <a class="obs-btn sec" href="peticiones/2026-10-09-termicas.html#respuesta" data-goatcounter-click="respuesta-termicas"><i class="fa-solid fa-envelope-open-text" aria-hidden="true"></i> Respuesta oficial: <span>pendiente</span></a>
+    </div>
     <p class="obs-lec"><b>Lección para el próximo verano:</b> cuando los aportes llevan meses bajos y los embalses están en su pico, hay que generar con térmicas y guardar el agua antes de que empiece la sequía, no después.</p>
   </aside>
 </section>
