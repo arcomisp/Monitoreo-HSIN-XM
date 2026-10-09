@@ -190,7 +190,7 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
       <p class="note">GWh por mes. Al pasar el cursor se ve también el % de la demanda del SIN.</p>
     </div>
     <div class="card tw">
-      <table class="data" id="dnasub" aria-label="Subáreas con mayor demanda no atendida en el año"><thead><tr><th>Subárea</th><th>GWh</th><th>Días con DNA</th></tr></thead><tbody></tbody></table>
+      <table class="data" id="dnasub" style="min-width:0" aria-label="Subáreas con mayor demanda no atendida en el año"><thead><tr><th>Subárea</th><th>GWh</th><th>Días con DNA</th></tr></thead><tbody></tbody></table>
       <p class="note">Subáreas con mayor DNA en el año. <b>Caribe</b> marca las subáreas de la costa Caribe.</p>
     </div>
   </div>
@@ -599,7 +599,7 @@ function drawDNA(){
   const pk=M.reduce((a,b)=>(b[1]+b[2])>(a[1]+a[2])?b:a);
   const car=X.sub.filter(r=>CAR.includes(r[0])).reduce((a,r)=>a+r[1],0);
   document.getElementById('txtdna').textContent=`En los últimos 30 días la demanda no atendida fue de ${nf(X.u30[0],1)} GWh (${nf(X.u30[1],2)} % de la demanda), frente a ${nf(X.anio[1],2)} % en lo que va del año. `+
-    `El mes más afectado fue ${MES[+pk[0].slice(5)-1]} (${nf(pk[1]+pk[2],1)} GWh). Las subáreas del Caribe suman ${nf(car,1)} GWh en el año, con cortes frecuentes por restricciones de la red. `+
+    `El mes más afectado fue ${['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'][+pk[0].slice(5)-1]} (${nf(pk[1]+pk[2],1)} GWh). Las subáreas del Caribe suman ${nf(car,1)} GWh en el año, con cortes frecuentes por restricciones de la red. `+
     `Estos niveles corresponden a eventos de red, no a falta de energía.`;
 }
 function all(){try{draw();draw2();draw3();draw4()}catch(e){console.error(e)}try{drawReg()}catch(e){console.error(e)}try{drawDNA()}catch(e){console.error(e)}heat();cuts()}
