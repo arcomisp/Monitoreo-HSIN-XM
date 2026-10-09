@@ -202,6 +202,37 @@ def main(src, dst):
     esc.update({w: v[1] for w, v in ESC.items()})
     D["esc"] = dict(sorted(esc.items()))
 
+    # --- Demanda no atendida (DNA): mensual, por subárea y últimos 30 días
+    dna_p = daily("DemaNoAtenProg", "Subarea", jan1, hoy)
+    dna_n = daily("DemaNoAtenNoProg", "Subarea", jan1, hoy)
+    dem = daily("DemaSIN", "Sistema", jan1, hoy)
+    mens, sub = {}, {}
+    for src, k in ((dna_p, 0), (dna_n, 1)):
+        for d, v in src.items():
+            mens.setdefault(d[:7], [0.0, 0.0, 0.0])[k] += sum(v.values())
+            for n, val in v.items():
+                nm = n.replace("SUBAREA ", "").replace("_", "-").title()
+                e = sub.setdefault(nm, [0.0, set()])
+                e[0] += val
+                if val > 0:
+                    e[1].add(d)
+    for d, v in dem.items():
+        mens.setdefault(d[:7], [0.0, 0.0, 0.0])[2] += sum(v.values())
+    dlast = max(set(dna_p) | set(dna_n)) if (dna_p or dna_n) else last
+    DL = dt.date.fromisoformat(dlast)
+    def dna_rango(d0):
+        ds = [(d0 + dt.timedelta(days=i)).isoformat() for i in range((DL - d0).days + 1)]
+        g_ = sum(sum(dna_p.get(x, {}).values()) + sum(dna_n.get(x, {}).values()) for x in ds)
+        m_ = sum(sum(dem.get(x, {}).values()) for x in ds if x in dem)
+        return round(g_, 2), round(100 * g_ / m_, 3) if m_ else None
+    u30, u30p = dna_rango(DL - dt.timedelta(days=29))
+    anio_g = sum(v[0] + v[1] for v in mens.values())
+    anio_d = sum(v[2] for v in mens.values())
+    D["dna"] = {"fecha": dlast,
+                "mensual": [[m, round(v[0], 2), round(v[1], 2), round(v[2], 0)] for m, v in sorted(mens.items())],
+                "sub": [[n, round(v[0], 2), len(v[1])] for n, v in sorted(sub.items(), key=lambda z: -z[1][0])[:10]],
+                "u30": [u30, u30p], "anio": [round(anio_g, 2), round(100 * anio_g / anio_d, 3) if anio_d else None]}
+
     g, c = res[last]
     D["meta"].update(fecha=last, E=round(g, 1), cap=round(c, 1), parcial=CA != eom(CA.year, CA.month), dia=CA.day,
                      generado=dt.datetime.now(dt.timezone(dt.timedelta(hours=-5))).strftime("%d/%m/%Y %H:%M"),

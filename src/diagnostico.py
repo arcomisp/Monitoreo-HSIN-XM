@@ -6,7 +6,7 @@ Reglas fijas y transparentes (no es un pronóstico):
   MODERADO  reservas más de 2 pp bajo la senda, o aportes del mes < 70 % de la media, o margen sobre la CAR < 20 pp
   BAJO      en los demás casos
 """
-import calendar, datetime as dt, html, json, sys
+import calendar, datetime as dt, html, json, os, sys
 
 MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
 REG = {"ANTIOQUIA": "Antioquia", "CALDAS": "Caldas", "CARIBE": "Caribe", "CENTRO": "Centro", "ORIENTE": "Oriente", "VALLE": "Valle"}
@@ -19,6 +19,22 @@ def n(x, d=1):
 def fecha(s):
     d = dt.date.fromisoformat(s)
     return f"{d.day} de {MESES[d.month - 1]} de {d.year}"
+
+
+def dna_30d(corte):
+    """DNA de los últimos 30 días (GWh y % de la demanda). Devuelve None si la API no responde."""
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from xm_brief import daily
+        d0 = corte - dt.timedelta(days=29)
+        p = daily("DemaNoAtenProg", "Area", d0, corte)
+        n = daily("DemaNoAtenNoProg", "Area", d0, corte)
+        dem = daily("DemaSIN", "Sistema", d0, corte)
+        g = (sum(sum(v.values()) for v in p.values()) + sum(sum(v.values()) for v in n.values())) / 1e6
+        m = sum(sum(v.values()) for v in dem.values()) / 1e6
+        return g, (100 * g / m if m else None)
+    except Exception:
+        return None
 
 
 def main(path, md=False):
@@ -84,6 +100,19 @@ def main(path, md=False):
     else:
         t += "La Senda de Referencia vigente terminó su horizonte; se usará la nueva senda cuando XM la publique."
     p.append(("¿Hacia dónde va?", t.strip()))
+
+    # 3b. ¿la energía está llegando a los usuarios?
+    dn = dna_30d(corte)
+    if dn and dn[1] is not None:
+        g, pc = dn
+        if pc < 0.3:
+            t = (f"En los últimos 30 días la demanda no atendida fue de {n(g)} GWh, el {n(pc, 2)} % de la demanda del país, un nivel normal. "
+                 "Es el nivel típico de eventos y restricciones en las redes (fallas, mantenimientos, equipos al límite) "
+                 "y no muestra señales de cortes por escasez de agua.")
+        else:
+            t = (f"En los últimos 30 días la demanda no atendida fue de {n(g)} GWh, el {n(pc, 2)} % de la demanda del país, por encima de lo normal. "
+                 "Conviene revisar sus causas en los reportes de XM para descartar que se deba a falta de energía.")
+        p.append(("¿La energía está llegando a los usuarios?", t))
 
     # 4. diagnóstico
     expl = {
