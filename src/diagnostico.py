@@ -38,14 +38,14 @@ def dna_30d(corte):
         return None
 
 
-def ter_tablero(path):
-    """Datos de térmicas (D.ter) del tablero index.html ya actualizado. None si no están."""
+def tablero_D(path):
+    """Datos (const D) del tablero index.html ya actualizado. {} si no se pueden leer."""
     try:
         s = open(path, encoding="utf-8").read()
         i = s.index("const D=") + 8
-        return json.JSONDecoder().raw_decode(s[i:])[0].get("ter")
+        return json.JSONDecoder().raw_decode(s[i:])[0]
     except Exception:
-        return None
+        return {}
 
 
 def texto_termicas(T, pct, sin):
@@ -86,28 +86,90 @@ def texto_termicas(T, pct, sin):
     return t
 
 
-def texto_positivo(T, cap, v7, meta=95.0, factor=0.9):
+def ritmo_gwh_7d(r):
+    """Descenso medio de las reservas en GWh/día en los últimos 7 días (positivo = bajan). No depende de cambios de capacidad útil."""
+    h = r.get("hace_7_dias") or {}
+    return (h["gwh"] - r["gwh"]) / 7 if h.get("gwh") else None
+
+
+def potencial_termico(T, factor=0.9):
+    fm = sum(x[2] for x in T.get("fuera", []))
+    return fm, fm * 24 * factor / 1000
+
+
+def texto_positivo(T, r, meta=95.0):
     """Conclusión positiva: cuánta agua se ahorraría si regresan las térmicas sin disponibilidad."""
-    fm = sum(r[2] for r in T.get("fuera", []))
+    fm, pot = potencial_termico(T)
+    cap = r["cap_gwh"]
     if fm < 50 or not cap:
         return None
-    pot = fm * 24 * factor / 1000            # GWh/día recuperables (supuesto: 90 % de uso)
-    pp_dia = pot / (cap / 100)                # puntos de reserva por día
+    pp_dia = pot / (cap / 100)
     t = (f"Hay respaldo que se puede recuperar. Si regresan las {len(T['fuera'])} plantas térmicas hoy sin disponibilidad ({n(fm, 0)} MW), "
-         f"podrían aportar unos {n(pot, 0)} GWh por día (suponiendo que operen al 90 %). Esa energía dejaría de salir de los embalses: equivale a ahorrar cerca de "
-         f"{n(pp_dia, 2)} puntos de reserva por día, unos {n(30 * pp_dia)} puntos por mes.")
-    if v7 is not None and v7 < 0:
-        caida = -v7 / 7
-        if pp_dia >= caida:
-            t += f" Es suficiente para frenar la caída actual de los embalses ({n(caida, 2)} puntos por día en la última semana)."
+         f"podrían aportar unos {n(pot, 0)} GWh por día (suponiendo que operen al 90 %). Esa energía dejaría de salir de los embalses: "
+         f"equivale a ahorrar cerca de {n(pp_dia, 2)} puntos de reserva por día, unos {n(30 * pp_dia)} puntos por mes.")
+    caida = ritmo_gwh_7d(r)
+    if caida is not None and caida > 0:
+        if pot >= caida:
+            t += (f" Es más que lo que están bajando hoy los embalses ({n(caida, 0)} GWh por día en la última semana): "
+                  "con esas plantas de vuelta, las reservas dejarían de caer al ritmo actual.")
         else:
-            t += (f" Con eso, la caída diaria de los embalses ({n(caida, 2)} puntos en promedio en la última semana) "
-                  f"se reduciría en {n(100 * pp_dia / caida, 0)} %.")
+            t += (f" Con eso, la caída de los embalses ({n(caida, 0)} GWh por día en la última semana) se reduciría en {n(100 * pot / caida, 0)} %.")
     g = T["u7"]["gwh_dia"]
     if g < meta <= g + pot:
         t += f" Además, la generación térmica pasaría de {n(g)} a unos {n(g + pot, 0)} GWh por día y superaría la meta de {n(meta, 0)} GWh por día fijada para El Niño."
     t += " Las térmicas no reemplazan la lluvia, pero sí ganan tiempo y protegen las reservas para el verano."
     return t
+
+
+def escenario_adverso(D, r, T):
+    """Escenario adverso (no es pronóstico): las reservas bajan todos los días al ritmo de la peor semana de los últimos 30 días.
+    Muestra el nivel al cierre del horizonte (30 de noviembre, inicio del verano) con y sin las medidas, en orden de prioridad."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from update_dashboard import CAR
+    g = [(x[0], x[4]) for x in D.get("daily", []) if x[4]]
+    if len(g) < 40:
+        return None
+    pasos = [(g[k][0], (g[k - 7][1] - g[k][1]) / 7) for k in range(len(g) - 30, len(g))]
+    fsem, ritmo = max(pasos, key=lambda z: z[1])
+    if ritmo <= 0:
+        return None
+    E, cap = r["gwh"], r["cap_gwh"]
+    d0 = dt.date.fromisoformat(r["fecha"])
+    fin = dt.date(d0.year, 11, 30)
+    if (fin - d0).days < 15:
+        fin = min(d0 + dt.timedelta(days=45), dt.date(d0.year, 12, 27))
+    dias = (fin - d0).days
+    car_fin = CAR.get(str(fin.isocalendar()[1]))
+    nivel = lambda rt: max(0.0, (E - rt * dias) / cap * 100)
+    dem = T["mensual"][-1][2] if T and T.get("mensual") else 250.0  # GWh/día de generación ≈ demanda
+    pot = potencial_termico(T)[1] if T else 0.0
+    vol, rac = 0.02 * dem, 0.05 * dem
+    def vs_car(x):
+        if car_fin is None:
+            return ""
+        dif = x - car_fin
+        return f", {n(abs(dif))} puntos {'por encima' if dif >= 0 else 'por debajo'} de la CAR"
+    b0 = nivel(ritmo)
+    intro = (f"Si las lluvias no llegan y los embalses bajaran todos los días al ritmo de la peor semana del último mes "
+             f"({n(ritmo, 0)} GWh por día, semana al {fecha(fsem)}), llegarían al {fecha(fin.isoformat())}, inicio del verano, con {n(b0)} %"
+             f"{vs_car(b0)} ({n(car_fin)} % en esa fecha). Es un escenario de cautela, no un pronóstico. "
+             "Las medidas, en orden de prioridad, y el nivel con que llegarían los embalses a esa fecha:" if car_fin else
+             f"Si las lluvias no llegan y los embalses bajaran al ritmo de la peor semana del último mes ({n(ritmo, 0)} GWh por día), "
+             f"llegarían al {fecha(fin.isoformat())} con {n(b0)} %. Es un escenario de cautela, no un pronóstico. Las medidas, en orden de prioridad:")
+    items, acum = [], 0.0
+    pasos_m = []
+    if pot > 0:
+        pasos_m.append((pot, f"Recuperar las térmicas paradas (unos {n(pot, 0)} GWh por día)"))
+    pasos_m.append((vol, f"Sumar ahorro voluntario del 2 % de la demanda con campañas y respuesta de la demanda (unos {n(vol, 0)} GWh por día)"))
+    pasos_m.append((rac, f"Solo como último recurso, racionamiento programado del 5 %, anunciado y por horarios y sectores (unos {n(rac, 0)} GWh por día)"))
+    for k, (gw, txt) in enumerate(pasos_m, 1):
+        acum += gw
+        x = nivel(ritmo - acum)
+        items.append(f"{k}. {txt}: {n(x)} %{vs_car(x)}.")
+    margen = r["pct"] - (r.get("car_pct") or 0)
+    cierre = (f"Hoy no se requiere racionamiento: las reservas están {n(margen)} puntos por encima de la CAR. "
+              "El escenario muestra que la prioridad es recuperar las térmicas y promover el ahorro voluntario, para no tener que llegar a cortes programados.")
+    return [intro] + items + [cierre]
 
 
 def main(path, md=False, tablero=None):
@@ -188,13 +250,22 @@ def main(path, md=False, tablero=None):
         p.append(("¿La energía está llegando a los usuarios?", t))
 
     # 3c. térmicas
-    T = ter_tablero(tablero) if tablero else None
+    DT = tablero_D(tablero) if tablero else {}
+    T = DT.get("ter")
     if T and T.get("u7") and T.get("mensual"):
         try:
             p.append(("¿Cómo están ayudando las térmicas?", texto_termicas(T, pct, sin)))
-            tp = texto_positivo(T, cap, v7)
+            tp = texto_positivo(T, r)
             if tp:
                 p.append(("Una señal positiva: el respaldo que se puede recuperar", tp))
+        except Exception:
+            pass
+
+    if DT:
+        try:
+            ea = escenario_adverso(DT, r, T)
+            if ea:
+                p.append(("Si las lluvias no llegan: escenario adverso y medidas", ea))
         except Exception:
             pass
 
@@ -218,7 +289,7 @@ def main(path, md=False, tablero=None):
     if md:
         out = [f"# Conclusión del día · {fecha(r['fecha'])}", "", f"**Nivel de riesgo: {nivel}**", ""]
         for h, t in p:
-            out += [f"## {h}", "", t, ""]
+            out += [f"## {h}", ""] + ([x for y in t for x in (y, "")] if isinstance(t, list) else [t, ""])
         out.append(f"_{nota}_")
         print("\n".join(out))
         return
@@ -227,7 +298,13 @@ def main(path, md=False, tablero=None):
            f'<span class="dx-fecha">Corte: {e(fecha(r["fecha"]))}</span></div>']
     for h, t in p:
         cls = ' class="dx-final"' if h.startswith("Diagnóstico") else ""
-        out.append(f"<div{cls}><h3>{e(h)}</h3><p>{e(t)}</p></div>")
+        if isinstance(t, list):
+            li = [x for x in t if x[:1].isdigit()]
+            body = (f"<p>{e(t[0])}</p><ol>" + "".join(f"<li>{e(x.split('. ', 1)[1])}</li>" for x in li) + "</ol>"
+                    + "".join(f"<p>{e(x)}</p>" for x in t[1:] if x not in li))
+        else:
+            body = f"<p>{e(t)}</p>"
+        out.append(f"<div{cls}><h3>{e(h)}</h3>{body}</div>")
     out.append(f'<p class="dx-nota">{e(nota)}</p>')
     print("\n".join(out))
 

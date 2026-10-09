@@ -20,7 +20,19 @@ En la última semana las plantas térmicas generaron 83,4 GWh por día, el 34 % 
 
 ## Una señal positiva: el respaldo que se puede recuperar
 
-Hay respaldo que se puede recuperar. Si regresan las 7 plantas térmicas hoy sin disponibilidad (847 MW), podrían aportar unos 18 GWh por día (suponiendo que operen al 90 %). Esa energía dejaría de salir de los embalses: equivale a ahorrar cerca de 0,10 puntos de reserva por día, unos 3,1 puntos por mes. Con eso, la caída diaria de los embalses (0,19 puntos en promedio en la última semana) se reduciría en 55 %. Además, la generación térmica pasaría de 83,4 a unos 102 GWh por día y superaría la meta de 95 GWh por día fijada para El Niño. Las térmicas no reemplazan la lluvia, pero sí ganan tiempo y protegen las reservas para el verano.
+Hay respaldo que se puede recuperar. Si regresan las 7 plantas térmicas hoy sin disponibilidad (847 MW), podrían aportar unos 18 GWh por día (suponiendo que operen al 90 %). Esa energía dejaría de salir de los embalses: equivale a ahorrar cerca de 0,10 puntos de reserva por día, unos 3,1 puntos por mes. Es más que lo que están bajando hoy los embalses (14 GWh por día en la última semana): con esas plantas de vuelta, las reservas dejarían de caer al ritmo actual. Además, la generación térmica pasaría de 83,4 a unos 102 GWh por día y superaría la meta de 95 GWh por día fijada para El Niño. Las térmicas no reemplazan la lluvia, pero sí ganan tiempo y protegen las reservas para el verano.
+
+## Si las lluvias no llegan: escenario adverso y medidas
+
+Si las lluvias no llegan y los embalses bajaran todos los días al ritmo de la peor semana del último mes (47 GWh por día, semana al 24 de septiembre de 2026), llegarían al 30 de noviembre de 2026, inicio del verano, con 60,9 %, 2,0 puntos por debajo de la CAR (62,9 % en esa fecha). Es un escenario de cautela, no un pronóstico. Las medidas, en orden de prioridad, y el nivel con que llegarían los embalses a esa fecha:
+
+1. Recuperar las térmicas paradas (unos 18 GWh por día): 66,3 %, 3,5 puntos por encima de la CAR.
+
+2. Sumar ahorro voluntario del 2 % de la demanda con campañas y respuesta de la demanda (unos 5 GWh por día): 67,8 %, 4,9 puntos por encima de la CAR.
+
+3. Solo como último recurso, racionamiento programado del 5 %, anunciado y por horarios y sectores (unos 12 GWh por día): 71,4 %, 8,6 puntos por encima de la CAR.
+
+Hoy no se requiere racionamiento: las reservas están 22,8 puntos por encima de la CAR. El escenario muestra que la prioridad es recuperar las térmicas y promover el ahorro voluntario, para no tener que llegar a cortes programados.
 
 ## ¿La energía está llegando a los usuarios?
 
