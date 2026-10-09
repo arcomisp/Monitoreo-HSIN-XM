@@ -63,6 +63,86 @@ def eom(y, m):
     return (dt.date(y + (m == 12), m % 12 + 1, 1) - dt.timedelta(days=1))
 
 
+LIQ = {"ACPM", "COMBUSTOLEO", "JET-A1", "GLP"}
+
+
+def hourly_rec(metric, d0, d1):
+    """Suma diaria (MWh) por recurso de una métrica horaria de XM."""
+    out, a = {}, d0
+    while a <= d1:
+        b = min(a + dt.timedelta(days=27), d1)
+        js = post("/hourly", {"MetricId": metric, "StartDate": a.isoformat(), "EndDate": b.isoformat(), "Entity": "Recurso"})
+        for it in js.get("Items", []):
+            for h in it["HourlyEntities"]:
+                v = h["Values"]
+                c = v.get("code") or v.get("Code")
+                hs = [float(v[k]) for k in v if k.startswith("Hour") and v[k] not in (None, "")]
+                if c and hs:
+                    out.setdefault(it["Date"], {})[c] = sum(hs) / 1e3
+        a = b + dt.timedelta(days=1)
+    return out
+
+
+def termicas(D, hoy):
+    """Generación térmica: mensual por combustible, uso de la disponibilidad y plantas sin disponibilidad."""
+    js = post("/lists", {"MetricId": "ListadoRecursos", "StartDate": hoy.isoformat(), "EndDate": hoy.isoformat(), "Entity": "Sistema"})
+    rec = {x["Values"]["Code"]: x["Values"] for i in js["Items"] for x in i["ListEntities"]}
+    ter = {c: v for c, v in rec.items() if (v.get("Type") or "").upper() == "TERMICA"}
+    desp = {c for c, v in ter.items() if (v.get("Disp") or "").startswith("DESPACHADO")}
+    T = D.get("ter") or {}
+    d0 = dt.date(hoy.year, 1, 1)
+    if T.get("mensual"):
+        pm = dt.date(hoy.year, hoy.month, 1) - dt.timedelta(days=1)
+        d0 = max(d0, dt.date(pm.year, pm.month, 1))
+    G, Dp = hourly_rec("Gene", d0, hoy), hourly_rec("DispoReal", d0, hoy)
+    dias = sorted(G)
+    if not dias:
+        return
+    def grupo(c):
+        f = ter[c].get("EnerSource", "")
+        return "gas" if f == "GAS" else "carbon" if f == "CARBON" else "liq" if f in LIQ else "otros"
+    mens = {r[0]: r for r in T.get("mensual", [])}
+    acc = {}
+    for d in dias:
+        a = acc.setdefault(d[:7], {"n": 0, "tot": 0.0, "gas": 0.0, "carbon": 0.0, "liq": 0.0, "otros": 0.0})
+        a["n"] += 1
+        for c, x in G[d].items():
+            a["tot"] += x
+            if c in ter:
+                a[grupo(c)] += x
+    for m, a in acc.items():
+        n = a["n"]
+        mens[m] = [m, n, round(a["tot"] / n / 1e3, 2)] + [round(a[k] / n / 1e3, 2) for k in ("gas", "carbon", "liq", "otros")]
+    # serie diaria (últimos 60 días): generación y disponibilidad de las térmicas despachadas centralmente, en MW medios
+    dia = {r[0]: r for r in T.get("diario", [])}
+    for d in dias:
+        g = sum(x for c, x in G[d].items() if c in desp)
+        dp = sum(x for c, x in Dp.get(d, {}).items() if c in desp)
+        tg = sum(x for c, x in G[d].items() if c in ter)
+        dia[d] = [d, round(g / 24), round(dp / 24), round(tg / 1e3, 2)]
+    diario = [dia[k] for k in sorted(dia)][-60:]
+    # capacidad máxima observada (MW) por planta despachada, conservada entre corridas
+    mx = T.get("maxmw", {})
+    for d, v in Dp.items():
+        for c, x in v.items():
+            if c in desp:
+                mx[c] = max(mx.get(c, 0), round(x / 24))
+    u7 = dias[-7:]
+    gen7 = {c: sum(G[d].get(c, 0) for d in u7) / len(u7) / 24 for c in desp}
+    dis7 = {c: sum(Dp.get(d, {}).get(c, 0) for d in u7) / len(u7) / 24 for c in desp}
+    nom = lambda c: ter[c]["Name"].title().replace("Cc", "CC").replace("Tebsab", "TEBSA").replace("Zipaemg", "Zipa")
+    fuel = lambda c: ter[c].get("EnerSource", "").capitalize().replace("Carbon", "Carbón").replace("Combustoleo", "Combustóleo").replace("Acpm", "ACPM").replace("Jet-a1", "Jet A1").replace("Glp", "GLP")
+    top = [[nom(c), fuel(c), round(gen7[c]), round(dis7[c])] for c in sorted(desp, key=lambda c: -gen7[c])[:12]]
+    fuera = [[nom(c), fuel(c), mx[c], round(dis7.get(c, 0))] for c in sorted(mx, key=lambda c: -mx[c])
+             if c in desp and mx[c] >= 20 and dis7.get(c, 0) < 0.2 * mx[c]]
+    tot7 = sum(sum(G[d].values()) for d in u7)
+    ter7 = sum(sum(x for c, x in G[d].items() if c in ter) for d in u7)
+    D["ter"] = {"fecha": dias[-1], "mensual": [mens[k] for k in sorted(mens)], "diario": diario, "maxmw": mx,
+                "top": top, "fuera": fuera,
+                "u7": {"gwh_dia": round(ter7 / len(u7) / 1e3, 1), "pct": round(100 * ter7 / tot7, 1),
+                       "gen_mw": round(sum(gen7.values())), "dispo_mw": round(sum(dis7.values()))}}
+
+
 def main(src, dst):
     s = open(src, encoding="utf-8").read()
     mt = re.search(r"const D=(\{.*?\});\n", s, re.S)
@@ -253,6 +333,11 @@ def main(src, dst):
                 "mensual": [[m, round(v[0], 2), round(v[1], 2), round(v[2], 0)] for m, v in sorted(mens.items())],
                 "sub": [[n, round(v[0], 2), len(v[1])] for n, v in sorted(sub.items(), key=lambda z: -z[1][0])[:10]],
                 "u30": [u30, u30p], "anio": [round(anio_g, 2), round(100 * anio_g / anio_d, 3) if anio_d else None], "caribe": caribe}
+
+    try:
+        termicas(D, hoy)
+    except Exception as e:
+        print("Térmicas: no se pudo actualizar:", e, file=sys.stderr)
 
     g, c = res[last]
     D["meta"].update(fecha=last, E=round(g, 1), cap=round(c, 1), parcial=CA != eom(CA.year, CA.month), dia=CA.day,
