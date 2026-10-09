@@ -190,75 +190,6 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
   </div>
 </section>
 
-<section class="sec" id="dna" aria-label="Demanda no atendida">
-  <h2>Demanda no atendida (DNA)</h2>
-  <p id="txtdna"></p>
-  <div class="grid2">
-    <div class="card">
-      <div class="legend"><span><i class="sw box" style="background:var(--water)"></i>No programada</span><span><i class="sw box" style="background:var(--senda)"></i>Programada</span></div>
-      <div class="cv sm"><canvas id="c13" aria-label="Demanda no atendida mensual del SIN en GWh, programada y no programada" role="img"></canvas></div>
-      <p class="note">GWh por mes. Al pasar el cursor se ve también el % de la demanda del SIN.</p>
-    </div>
-    <div class="card tw">
-      <table class="data" id="dnasub" style="min-width:0" aria-label="Subáreas con mayor demanda no atendida en el año"><thead><tr><th>Subárea</th><th>GWh</th><th>Días con DNA</th></tr></thead><tbody></tbody></table>
-      <p class="note">Subáreas con mayor DNA en el año. <b>Caribe</b> marca las subáreas de la costa Caribe.</p>
-    </div>
-  </div>
-  <div class="card" id="dnacar">
-    <h3 class="sub-h">Consolidado Caribe: 7 departamentos</h3>
-    <p class="note" style="margin-top:0" id="txtcar"></p>
-    <div class="grid2">
-      <div class="tw"><table class="data" style="min-width:0" id="cartab" aria-label="Demanda no atendida en la región Caribe por subárea">
-        <thead><tr><th>Subárea</th><th>Departamentos</th><th>GWh año</th><th>Últ. 30 días</th><th>Días con DNA</th></tr></thead><tbody></tbody></table></div>
-      <div>
-        <div class="legend" id="carleg"></div>
-        <div class="cv sm"><canvas id="c14" aria-label="Demanda no atendida mensual en el Caribe por subárea" role="img"></canvas></div>
-      </div>
-    </div>
-    <p class="note">XM reporta la DNA por subárea operativa: GCM agrupa La Guajira, Cesar y Magdalena, y Córdoba-Sucre agrupa esos dos departamentos, por lo que la API no permite separar cada departamento dentro de esas subáreas. San Andrés no está conectado al SIN.</p>
-  </div>
-  <div class="card sismo">
-    <h3>Evento destacado: el sismo de agosto de 2026 en el Valle y el Eje Cafetero</h3>
-    <p>A partir del <b>10 de agosto</b>, el sismo dañó las <b>redes de distribución local (SDL)</b> del Valle del Cauca y de Caldas, Quindío y Risaralda. No afectó la generación ni la red de transmisión nacional: la energía estaba disponible, pero no podía llegar a los usuarios por los daños en las redes de los operadores.</p>
-    <h4 class="ago-h">Agosto de 2026 por separado: cuánto fue el sismo y cuánto lo habitual</h4>
-    <div class="ago-k">
-      <div><span>DNA total de agosto</span><b>34,5 GWh</b><em>0,45 % de la demanda del mes</em></div>
-      <div><span>Por el sismo (Valle y CQR)</span><b>28,5 GWh</b><em>82 % de la DNA de agosto</em></div>
-      <div><span>Resto de agosto</span><b>6,0 GWh</b><em>0,08 % de la demanda</em></div>
-      <div><span>Promedio de los demás meses</span><b>4,9 GWh</b><em>enero a septiembre, sin agosto</em></div>
-    </div>
-    <div class="legend"><span><i class="sw box" style="background:var(--senda)"></i>DNA por el sismo</span><span><i class="sw box" style="background:var(--water)"></i>Resto del país</span></div>
-    <div class="cv sm"><canvas id="c15" aria-label="Demanda no atendida diaria de agosto de 2026, separando el efecto del sismo" role="img"></canvas></div>
-    <p class="note" style="margin-top:0">Sin el sismo, agosto habría tenido 6,0 GWh de DNA, en línea con un mes normal. Es decir, el aumento de agosto se explica casi por completo por el terremoto y no por falta de energía ni por un deterioro general de la red.</p>
-    <div class="grid2">
-      <div class="tw"><table class="data" style="min-width:0" aria-label="Demanda no atendida diaria por el sismo, en MWh">
-        <thead><tr><th>Día</th><th>Valle (MWh)</th><th>CQR (MWh)</th></tr></thead>
-        <tbody>
-          <tr><td>10 ago</td><td>5.256</td><td>2.947</td></tr>
-          <tr><td>11 ago</td><td>8.238</td><td>986</td></tr>
-          <tr><td>12 ago</td><td>4.931</td><td>635</td></tr>
-          <tr><td>13 ago</td><td>2.342</td><td>247</td></tr>
-          <tr><td>14 ago</td><td>2.228</td><td>139</td></tr>
-          <tr><td>15 ago</td><td>129</td><td>60</td></tr>
-          <tr><td>16–20 ago</td><td>0</td><td>343</td></tr>
-          <tr><td><b>Total</b></td><td><b>23.124</b></td><td><b>5.357</b></td></tr>
-        </tbody></table></div>
-      <div>
-        <ul class="sismo-l">
-          <li><b>28,5 GWh</b> no atendidos en 11 días: cerca del <b>38 %</b> de toda la DNA de 2026.</li>
-          <li><b>Valle del Cauca (CELSIA):</b> el pico fue el 11 de agosto (8.238 MWh). El 15 de agosto aún había cortes en Dagua, Versalles, Caicedonia, Calima-Darién, El Cairo, Sevilla, Buenaventura, Zarzal, Roldanillo, Bugalagrande, Riofrío, Yotoco, La Cumbre y Bolívar.</li>
-          <li><b>Risaralda (EEP):</b> afectaciones en Pereira; 39 MWh no atendidos el 15 de agosto.</li>
-          <li><b>Caldas (CHEC):</b> afectaciones en Viterbo; 15,9 MWh el 15 de agosto.</li>
-          <li><b>Quindío (EDEQ):</b> afectaciones en Génova; 5,1 MWh el 15 de agosto.</li>
-          <li><b>Recuperación:</b> el Valle normalizó el servicio el 16 de agosto (6 días); la CQR mantuvo cortes menores hasta el 20 de agosto.</li>
-        </ul>
-      </div>
-    </div>
-    <p class="note">Fuente: XM, API de demanda no atendida por subárea, y reporte de eventos de DNA del CND del 15 de agosto de 2026 ("Continúa demanda no atendida por afectaciones al SDL, como consecuencia del sismo presentado en el país"). CQR: Caldas, Quindío y Risaralda.</p>
-  </div>
-  <p class="note">La DNA es la energía que no llegó a los usuarios. Puede deberse a fallas, mantenimientos o restricciones de la red, o, en una situación de escasez, a racionamiento. Datos preliminares de XM: el CND los valida después en su módulo de sucesos (SIO).</p>
-</section>
-
 <section class="sec" aria-label="Semáforo de alertas">
   <h2>Semáforo de alertas</h2>
   <div class="semaforo" id="semaforo"></div>
@@ -367,6 +298,75 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
     <table class="data" id="cuts"><thead><tr><th>Corte</th><th>Reserva (GWh)</th><th>Capacidad útil (GWh)</th><th>Reserva útil</th><th>Δ pp</th><th>Δ GWh</th><th>Senda</th><th>Brecha</th><th>Vertido en el mes (GWh)</th></tr></thead><tbody></tbody></table>
     <p class="note">La capacidad útil cambió durante el año (Guavio +528 GWh el 30 de junio, Ituango +187 GWh el 5 de octubre). Por eso el Δ pp no siempre coincide con el Δ GWh. Vertido en el mes: agua que salió de los embalses sin generar, en GWh equivalentes<span id="vhasta"></span>.</p>
   </div>
+</section>
+
+<section class="sec" id="dna" aria-label="Demanda no atendida">
+  <h2>Demanda no atendida (DNA)</h2>
+  <p id="txtdna"></p>
+  <div class="grid2">
+    <div class="card">
+      <div class="legend"><span><i class="sw box" style="background:var(--water)"></i>No programada</span><span><i class="sw box" style="background:var(--senda)"></i>Programada</span></div>
+      <div class="cv sm"><canvas id="c13" aria-label="Demanda no atendida mensual del SIN en GWh, programada y no programada" role="img"></canvas></div>
+      <p class="note">GWh por mes. Al pasar el cursor se ve también el % de la demanda del SIN.</p>
+    </div>
+    <div class="card tw">
+      <table class="data" id="dnasub" style="min-width:0" aria-label="Subáreas con mayor demanda no atendida en el año"><thead><tr><th>Subárea</th><th>GWh</th><th>Días con DNA</th></tr></thead><tbody></tbody></table>
+      <p class="note">Subáreas con mayor DNA en el año. <b>Caribe</b> marca las subáreas de la costa Caribe.</p>
+    </div>
+  </div>
+  <div class="card" id="dnacar">
+    <h3 class="sub-h">Consolidado Caribe: 7 departamentos</h3>
+    <p class="note" style="margin-top:0" id="txtcar"></p>
+    <div class="grid2">
+      <div class="tw"><table class="data" style="min-width:0" id="cartab" aria-label="Demanda no atendida en la región Caribe por subárea">
+        <thead><tr><th>Subárea</th><th>Departamentos</th><th>GWh año</th><th>Últ. 30 días</th><th>Días con DNA</th></tr></thead><tbody></tbody></table></div>
+      <div>
+        <div class="legend" id="carleg"></div>
+        <div class="cv sm"><canvas id="c14" aria-label="Demanda no atendida mensual en el Caribe por subárea" role="img"></canvas></div>
+      </div>
+    </div>
+    <p class="note">XM reporta la DNA por subárea operativa: GCM agrupa La Guajira, Cesar y Magdalena, y Córdoba-Sucre agrupa esos dos departamentos, por lo que la API no permite separar cada departamento dentro de esas subáreas. San Andrés no está conectado al SIN.</p>
+  </div>
+  <div class="card sismo">
+    <h3>Evento destacado: el sismo de agosto de 2026 en el Valle y el Eje Cafetero</h3>
+    <p>A partir del <b>10 de agosto</b>, el sismo dañó las <b>redes de distribución local (SDL)</b> del Valle del Cauca y de Caldas, Quindío y Risaralda. No afectó la generación ni la red de transmisión nacional: la energía estaba disponible, pero no podía llegar a los usuarios por los daños en las redes de los operadores.</p>
+    <h4 class="ago-h">Agosto de 2026 por separado: cuánto fue el sismo y cuánto lo habitual</h4>
+    <div class="ago-k">
+      <div><span>DNA total de agosto</span><b>34,5 GWh</b><em>0,45 % de la demanda del mes</em></div>
+      <div><span>Por el sismo (Valle y CQR)</span><b>28,5 GWh</b><em>82 % de la DNA de agosto</em></div>
+      <div><span>Resto de agosto</span><b>6,0 GWh</b><em>0,08 % de la demanda</em></div>
+      <div><span>Promedio de los demás meses</span><b>4,9 GWh</b><em>enero a septiembre, sin agosto</em></div>
+    </div>
+    <div class="legend"><span><i class="sw box" style="background:var(--senda)"></i>DNA por el sismo</span><span><i class="sw box" style="background:var(--water)"></i>Resto del país</span></div>
+    <div class="cv sm"><canvas id="c15" aria-label="Demanda no atendida diaria de agosto de 2026, separando el efecto del sismo" role="img"></canvas></div>
+    <p class="note" style="margin-top:0">Sin el sismo, agosto habría tenido 6,0 GWh de DNA, en línea con un mes normal. Es decir, el aumento de agosto se explica casi por completo por el terremoto y no por falta de energía ni por un deterioro general de la red.</p>
+    <div class="grid2">
+      <div class="tw"><table class="data" style="min-width:0" aria-label="Demanda no atendida diaria por el sismo, en MWh">
+        <thead><tr><th>Día</th><th>Valle (MWh)</th><th>CQR (MWh)</th></tr></thead>
+        <tbody>
+          <tr><td>10 ago</td><td>5.256</td><td>2.947</td></tr>
+          <tr><td>11 ago</td><td>8.238</td><td>986</td></tr>
+          <tr><td>12 ago</td><td>4.931</td><td>635</td></tr>
+          <tr><td>13 ago</td><td>2.342</td><td>247</td></tr>
+          <tr><td>14 ago</td><td>2.228</td><td>139</td></tr>
+          <tr><td>15 ago</td><td>129</td><td>60</td></tr>
+          <tr><td>16–20 ago</td><td>0</td><td>343</td></tr>
+          <tr><td><b>Total</b></td><td><b>23.124</b></td><td><b>5.357</b></td></tr>
+        </tbody></table></div>
+      <div>
+        <ul class="sismo-l">
+          <li><b>28,5 GWh</b> no atendidos en 11 días: cerca del <b>38 %</b> de toda la DNA de 2026.</li>
+          <li><b>Valle del Cauca (CELSIA):</b> el pico fue el 11 de agosto (8.238 MWh). El 15 de agosto aún había cortes en Dagua, Versalles, Caicedonia, Calima-Darién, El Cairo, Sevilla, Buenaventura, Zarzal, Roldanillo, Bugalagrande, Riofrío, Yotoco, La Cumbre y Bolívar.</li>
+          <li><b>Risaralda (EEP):</b> afectaciones en Pereira; 39 MWh no atendidos el 15 de agosto.</li>
+          <li><b>Caldas (CHEC):</b> afectaciones en Viterbo; 15,9 MWh el 15 de agosto.</li>
+          <li><b>Quindío (EDEQ):</b> afectaciones en Génova; 5,1 MWh el 15 de agosto.</li>
+          <li><b>Recuperación:</b> el Valle normalizó el servicio el 16 de agosto (6 días); la CQR mantuvo cortes menores hasta el 20 de agosto.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">Fuente: XM, API de demanda no atendida por subárea, y reporte de eventos de DNA del CND del 15 de agosto de 2026 ("Continúa demanda no atendida por afectaciones al SDL, como consecuencia del sismo presentado en el país"). CQR: Caldas, Quindío y Risaralda.</p>
+  </div>
+  <p class="note">La DNA es la energía que no llegó a los usuarios. Puede deberse a fallas, mantenimientos o restricciones de la red, o, en una situación de escasez, a racionamiento. Datos preliminares de XM: el CND los valida después en su módulo de sucesos (SIO).</p>
 </section>
 
 <section class="gratis" aria-label="Servicio gratuito"><b>Servicio de consulta gratuito</b><span>Este tablero es de libre acceso y se actualiza todos los días. Si le resulta útil, le agradezco seguirme en mis redes sociales y apoyar mis publicaciones con un like y un repost.</span>
