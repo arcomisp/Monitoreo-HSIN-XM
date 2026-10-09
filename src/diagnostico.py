@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Conclusión del día en lenguaje sencillo, a partir de la salida de xm_brief.py.
-Uso: python3 diagnostico.py xm.json [--md] > reportes/DIAGNOSTICO.html
+Uso: python3 diagnostico.py xm.json [--md] [--tablero index.html] > reportes/DIAGNOSTICO.html
+(--tablero: lee del tablero ya actualizado los datos de generación térmica)
 Reglas fijas y transparentes (no es un pronóstico):
   ALTO      margen sobre la CAR < 10 pp, o reservas más de 8 pp bajo la Senda de Referencia
   MODERADO  reservas más de 2 pp bajo la senda, o aportes del mes < 70 % de la media, o margen sobre la CAR < 20 pp
@@ -37,7 +38,55 @@ def dna_30d(corte):
         return None
 
 
-def main(path, md=False):
+def ter_tablero(path):
+    """Datos de térmicas (D.ter) del tablero index.html ya actualizado. None si no están."""
+    try:
+        s = open(path, encoding="utf-8").read()
+        i = s.index("const D=") + 8
+        return json.JSONDecoder().raw_decode(s[i:])[0].get("ter")
+    except Exception:
+        return None
+
+
+def texto_termicas(T, pct, sin):
+    u = T["u7"]
+    M = T["mensual"]
+    mn = M[-1]
+    ter = lambda m: m[3] + m[4] + m[5] + m[6]
+    uso = 100 * u["gen_mw"] / u["dispo_mw"] if u.get("dispo_mw") else None
+    t = (f"En la última semana las plantas térmicas generaron {n(u['gwh_dia'])} GWh por día, el {n(u['pct'], 0)} % de la energía del país "
+         f"(en enero era el {n(100 * ter(M[0]) / M[0][2], 0)} %). Mientras más energía aportan las térmicas, menos agua se saca de los embalses.")
+    if uso is not None:
+        if uso >= 95:
+            t += f" Están entregando el {n(uso, 0)} % de lo que tienen disponible: prácticamente al tope, sin margen térmico adicional."
+        elif uso >= 80:
+            t += f" Están entregando el {n(uso, 0)} % de lo que tienen disponible: queda un margen pequeño."
+        else:
+            t += f" Están entregando el {n(uso, 0)} % de lo que tienen disponible: hay margen para generar más con térmicas y cuidar el agua."
+    # disponibilidad: últimos 7 días frente a un mes antes
+    dd = [r for r in T.get("diario", []) if r[2]]
+    if len(dd) >= 37:
+        a = sum(r[2] for r in dd[-7:]) / 7
+        b = sum(r[2] for r in dd[-37:-30]) / 7
+        if a < 0.9 * b:
+            t += f" La potencia térmica disponible bajó de unos {n(b, 0)} MW hace un mes a {n(a, 0)} MW, lo que reduce el respaldo."
+        elif a > 1.1 * b:
+            t += f" La potencia térmica disponible subió de unos {n(b, 0)} MW hace un mes a {n(a, 0)} MW, lo que fortalece el respaldo."
+    if len(M) >= 4 and mn[5] > 2 and mn[5] > 2 * M[-4][5]:
+        t += (f" El uso de combustibles líquidos (ACPM, combustóleo, jet), los más costosos, subió a {n(mn[5])} GWh por día, "
+              f"frente a {n(M[-4][5])} hace tres meses: suele indicar que el gas disponible no alcanza y presiona al alza el precio de la energía.")
+    fm = sum(r[2] for r in T.get("fuera", []))
+    if fm >= 50:
+        nombres = ", ".join(r[0] for r in T["fuera"][:3])
+        t += f" Hay {n(fm, 0)} MW térmicos sin disponibilidad (entre ellos {nombres}); recuperarlos sería el respaldo adicional más inmediato."
+    if uso is not None and uso < 90 and sin < 80 and pct >= 70:
+        t += " Con lluvias bajas y embalses aún altos, es un buen momento para generar más con térmicas y guardar agua para el verano."
+    elif uso is not None and uso >= 95 and sin < 80:
+        t += " Como las térmicas ya dan todo lo que pueden, cuidar el agua depende ahora de recuperar las plantas fuera de servicio y de asegurar el gas."
+    return t
+
+
+def main(path, md=False, tablero=None):
     j = json.load(open(path, encoding="utf-8"))
     r, ap = j["reservas"], j["aportes_mes"]
     corte = dt.date.fromisoformat(r["fecha"])
@@ -114,6 +163,17 @@ def main(path, md=False):
                  "Conviene revisar sus causas en los reportes de XM para descartar que se deba a falta de energía.")
         p.append(("¿La energía está llegando a los usuarios?", t))
 
+    # 3c. térmicas
+    T = ter_tablero(tablero) if tablero else None
+    if T and T.get("u7") and T.get("mensual"):
+        try:
+            p.append(("¿Cómo están ayudando las térmicas?", texto_termicas(T, pct, sin)))
+        except Exception:
+            pass
+
+    # la DNA va al final, justo antes del diagnóstico
+    p.sort(key=lambda x: x[0].startswith("¿La energía"))
+
     # 4. diagnóstico
     expl = {
         "BAJO": "El sistema tiene agua suficiente y avanza según lo planeado. No hay señales de riesgo para el abastecimiento de energía.",
@@ -146,4 +206,5 @@ def main(path, md=False):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], "--md" in sys.argv)
+    a = sys.argv
+    main(a[1], "--md" in a, a[a.index("--tablero") + 1] if "--tablero" in a else None)

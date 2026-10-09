@@ -14,6 +14,10 @@ Los ríos están trayendo menos agua de lo normal: en lo que va de octubre llega
 
 En la última semana las reservas bajaron 1,3 puntos. Para llegar a la meta de fin de mes (79,5 % el 31 de octubre de 2026), los embalses necesitarían ganar unos 826 GWh en 23 días, es decir, recibir más agua de la que se usa para generar energía. Eso depende de que las lluvias se fortalezcan.
 
+## ¿Cómo están ayudando las térmicas?
+
+En la última semana las plantas térmicas generaron 83,4 GWh por día, el 34 % de la energía del país (en enero era el 12 %). Mientras más energía aportan las térmicas, menos agua se saca de los embalses. Están entregando el 97 % de lo que tienen disponible: prácticamente al tope, sin margen térmico adicional. La potencia térmica disponible bajó de unos 4.418 MW hace un mes a 3.522 MW, lo que reduce el respaldo. El uso de combustibles líquidos (ACPM, combustóleo, jet), los más costosos, subió a 14,8 GWh por día, frente a 2,1 hace tres meses: suele indicar que el gas disponible no alcanza y presiona al alza el precio de la energía. Hay 847 MW térmicos sin disponibilidad (entre ellos Gecelca 32, Termovalle CC, Guajira 1); recuperarlos sería el respaldo adicional más inmediato. Como las térmicas ya dan todo lo que pueden, cuidar el agua depende ahora de recuperar las plantas fuera de servicio y de asegurar el gas.
+
 ## ¿La energía está llegando a los usuarios?
 
 En los últimos 30 días la demanda no atendida fue de 5,4 GWh, el 0,08 % de la demanda del país, un nivel normal. Es el nivel típico de eventos y restricciones en las redes (fallas, mantenimientos, equipos al límite) y no muestra señales de cortes por escasez de agua.
