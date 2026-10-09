@@ -39,12 +39,12 @@ jobs:
           cat reportes/ULTIMO.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Actualizar tablero
-        run: python3 src/update_dashboard.py dashboard/index.html dashboard/index.html
+        run: python3 src/update_dashboard.py index.html index.html
 
       - name: Guardar cambios
         run: |
           git config user.name "xm-bot"
           git config user.email "xm-bot@users.noreply.github.com"
-          git add -A reportes dashboard
+          git add -A reportes index.html
           git diff --cached --quiet || git commit -m "Datos XM al $FECHA"
           git push

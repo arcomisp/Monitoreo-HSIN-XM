@@ -1,61 +1,462 @@
-<!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Monitoreo HSIN · XM</title>
-<meta name="description" content="Análisis diario de aportes hídricos, reservas y Senda de Referencia del SIN de Colombia con datos de XM.">
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Senda Hídrica SIN 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-:root{--bg:#f6f8f9;--surface:#fff;--ink:#0f1a22;--ink2:#4a5862;--ink3:#7a8790;--rule:#dde4e8;--accent:#2a78d6;--warn:#e34948}
-@media (prefers-color-scheme:dark){:root{--bg:#0f1418;--surface:#161d22;--ink:#eef3f6;--ink2:#b4c0c8;--ink3:#8a979f;--rule:#2a343b;--accent:#3987e5;--warn:#e66767}}
+
+/* Layout: tablero de lectura vertical; resumen arriba, luego stock (reservas) y después flujo (aportes). */
+:root{
+  --bg:#f6f8f9; --surface:#ffffff; --ink:#0f1a22; --ink-2:#4a5862; --ink-3:#7a8790; --rule:#dde4e8; --grid:#e9eef1;
+  --water:#2a78d6; --senda:#eb6834; --car:#7a8790; --risk:#e3494822; --pos:#2a78d6; --neg:#e34948; --mid:#f0efec;
+  --band:#2a78d61f; --c3:#1baf7a;
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif; --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1418; --surface:#161d22; --ink:#eef3f6; --ink-2:#b4c0c8; --ink-3:#8a979f; --rule:#2a343b; --grid:#222b31;
+  --water:#3987e5; --senda:#d95926; --car:#8a979f; --risk:#e6676726; --pos:#3987e5; --neg:#e66767; --mid:#383835; --band:#3987e526; --c3:#199e70; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1418; --surface:#161d22; --ink:#eef3f6; --ink-2:#b4c0c8; --ink-3:#8a979f; --rule:#2a343b; --grid:#222b31;
+  --water:#3987e5; --senda:#d95926; --car:#8a979f; --risk:#e6676726; --pos:#3987e5; --neg:#e66767; --mid:#383835; --band:#3987e526; --c3:#199e70; color-scheme:dark}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
-.wrap{max-width:920px;margin:0 auto;padding:28px 16px 56px;display:flex;flex-direction:column;gap:22px}
-.eyebrow{font:12px ui-monospace,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
-h1{font-size:clamp(28px,5vw,40px);line-height:1.1;margin:4px 0 6px}
-.lede{color:var(--ink2);margin:0}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-a.card{display:flex;flex-direction:column;gap:4px;background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:16px;color:inherit;text-decoration:none}
-a.card:hover{border-color:var(--accent)}
-a.card b{font-size:16px;color:var(--accent)}
-a.card span{color:var(--ink2);font-size:13.5px}
-.brief{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:8px 20px 16px;overflow-x:auto}
-.brief h1{font-size:22px}.brief h2{font-size:17px;margin-top:22px}
-.brief table{border-collapse:collapse;width:100%;min-width:560px;font-size:13.5px;font-variant-numeric:tabular-nums}
-.brief th,.brief td{border-bottom:1px solid var(--rule);padding:6px 8px;text-align:right}
-.brief th:first-child,.brief td:first-child{text-align:left}
-.brief li{margin:2px 0}
-footer{font-size:12.5px;color:var(--ink3);border-top:1px solid var(--rule);padding-top:12px}
-footer a{color:var(--accent)}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px;padding-block:28px 56px;display:flex;flex-direction:column;gap:28px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+h1{font-family:var(--f-display);font-stretch:80%;font-weight:750;font-size:clamp(30px,5vw,46px);line-height:1.02;margin:0;text-wrap:balance}
+.lede{color:var(--ink-2);max-width:68ch;margin:0}
+h2{font-family:var(--f-display);font-stretch:85%;font-weight:700;font-size:22px;margin:0;text-wrap:balance}
+.sec{display:flex;flex-direction:column;gap:14px}
+.sec>p{margin:0;color:var(--ink-2);max-width:72ch}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.kpi .l{font-size:12.5px;color:var(--ink-2)}
+.kpi .v{font-family:var(--f-display);font-stretch:85%;font-weight:700;font-size:32px;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi .s{font-family:var(--f-mono);font-size:12px;color:var(--ink-3)}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;width:fit-content}
+.chip.warn{background:#eda10026;color:var(--ink)} .chip.bad{background:var(--risk);color:var(--ink)} .chip.ok{background:#1baf7a26;color:var(--ink)}
+.chip i{width:7px;height:7px;border-radius:50%;display:inline-block}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:16px 16px 10px;min-width:0}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--ink-2);margin-bottom:6px}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.sw{width:18px;height:3px;border-radius:2px;display:inline-block}
+.sw.dash{background:repeating-linear-gradient(90deg,var(--senda) 0 5px,transparent 5px 8px)!important}
+.sw.box{height:10px;width:14px;border-radius:2px}
+.sw.dot{background:repeating-linear-gradient(90deg,var(--c3) 0 3px,transparent 3px 7px)!important}
+.an-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-bottom:14px}
+.an-def{border-top:4px solid var(--st);padding-top:10px}
+.an-def b{display:block;font-size:16px;margin-bottom:4px}
+.an-def .f{display:inline-block;margin-top:8px;font-weight:600;color:var(--st);font-size:13.5px}
+@media (max-width:760px){.an-grid{grid-template-columns:minmax(0,1fr)}}
+.cv{position:relative;height:360px}
+.cv.sm{height:260px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.note{font-size:12.5px;color:var(--ink-3);margin:6px 0 4px}
+.heat{overflow-x:auto}
+.heat table{border-collapse:separate;border-spacing:2px;font-variant-numeric:tabular-nums;font-family:var(--f-mono);font-size:12.5px;width:100%;min-width:640px}
+.heat th{font-family:var(--f-body);font-weight:500;color:var(--ink-2);font-size:12.5px;padding:4px 6px;text-align:center}
+.heat th.r{text-align:left}
+.heat td{padding:8px 4px;text-align:center;border-radius:4px;color:var(--ink);cursor:default}
+.heat tr.sin td,.heat tr.sin th{font-weight:600}
+.scale{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-3);flex-wrap:wrap}
+.scale b{display:inline-block;width:160px;height:10px;border-radius:3px}
+table.data{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:13.5px;min-width:620px}
+table.data th{text-align:right;font-weight:500;color:var(--ink-2);border-bottom:1px solid var(--rule);padding:8px 10px;font-size:12.5px}
+table.data td{text-align:right;padding:7px 10px;border-bottom:1px solid var(--grid);font-family:var(--f-mono);font-size:13px}
+table.data th:first-child,table.data td:first-child{text-align:left;font-family:var(--f-body)}
+.up{color:var(--pos)} .dn{color:var(--neg)}
+.tw{overflow-x:auto}
+.author{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin-top:6px;font-size:13.5px;color:var(--ink-2)}
+.author b{font-weight:600;color:var(--ink)}
+.author a{color:var(--water);text-decoration:none}.author a:hover{text-decoration:underline}
+.author a:focus-visible{outline:2px solid var(--water);outline-offset:2px;border-radius:2px}
+.contact{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--f-mono);font-size:12.5px;color:var(--ink-2)}
+.contact span{user-select:all}
+.semaforo{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:stretch}
+.sem-g{grid-column:1/-1}
+.sem-g{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.sem-g .big{font-family:var(--f-display);font-stretch:85%;font-weight:750;font-size:26px;line-height:1.1}
+.sem-i{background:var(--surface);border:1px solid var(--rule);border-top:4px solid var(--st);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.sem-i .n{font-size:12.5px;color:var(--ink-2)}
+.sem-i .v{font-family:var(--f-mono);font-size:20px;font-weight:500;font-variant-numeric:tabular-nums}
+.sem-i .u{font-size:11.5px;color:var(--ink-3);font-family:var(--f-mono)}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;width:fit-content;padding:2px 8px;border-radius:99px;background:color-mix(in srgb,var(--st) 18%,transparent);color:var(--ink)}
+.st i{width:8px;height:8px;border-radius:50%;background:var(--st);display:inline-block}
+.sem-note{font-size:12.5px;color:var(--ink-3);margin:0}
+@media (max-width:900px){.semaforo{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.nav{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:10px}
+.nav a{font-size:13px;font-weight:600;color:var(--water);text-decoration:none;border:1px solid var(--rule);background:var(--surface);border-radius:99px;padding:5px 12px}
+.nav a:hover{border-color:var(--water)}
+.brief{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:6px 16px 12px;overflow-x:auto}
+.brief h1{display:none}.brief h2{font-size:16px;margin:16px 0 6px;font-family:var(--f-display)}
+.brief table{border-collapse:collapse;width:100%;min-width:560px;font-variant-numeric:tabular-nums;font-size:13px}
+.brief th{color:var(--ink-2);font-weight:500;border-bottom:1px solid var(--rule);padding:6px 8px;text-align:right}
+.brief td{font-family:var(--f-mono);border-bottom:1px solid var(--grid);padding:6px 8px;text-align:right}
+.brief th:first-child,.brief td:first-child{text-align:left;font-family:var(--f-body)}
+.brief p,.brief li{color:var(--ink-2);font-size:14px}
+footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padding-top:14px;display:flex;flex-direction:column;gap:4px}
+#tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:6px 9px;border-radius:6px;font-family:var(--f-mono);display:none;z-index:9;max-width:240px}
+@media (max-width:760px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:minmax(0,1fr)}.cv{height:300px}.kpi .v{font-size:27px}}
 </style>
-</head>
-<body>
+
+
 <div class="wrap">
-  <header>
-    <div class="eyebrow">Sistema Interconectado Nacional · datos XM</div>
-    <h1>Monitoreo HSIN · XM</h1>
-    <p class="lede">Aportes hídricos por región, reservas de los embalses frente a la Senda de Referencia (Res. CREG 209 de 2020) y la CAR, y vertimientos. Se actualiza todos los días a las 7:40 a.m. (hora de Colombia).</p>
-  </header>
+<header>
+  <div class="eyebrow" id="eyebrow">Sistema Interconectado Nacional · datos XM</div>
+  <h1>Senda Hídrica del SIN 2026</h1>
+  <p class="lede">Reserva útil del SIN frente a la Senda de Referencia (Res. CREG 209 de 2020) y la Curva de Administración del Riesgo (CAR), junto con los aportes hídricos medidos contra su media histórica.</p>
+  <div class="author"><span>Análisis de <b>Alejandro Aroca</b>, Ingeniero Eléctrico · Consultor y Auditor Senior en Proyectos de Energía</span><a href="https://www.linkedin.com/in/alejandro-aroca-ssecc" target="_blank" rel="noopener">LinkedIn</a></div>
+<nav class="nav" aria-label="Secciones"><a href="#brief-dia">Brief del día</a><a href="https://github.com/arcomisp/Monitoreo-HSIN-XM/tree/main/reportes">Histórico de briefs</a><a href="https://github.com/arcomisp/Monitoreo-HSIN-XM#readme">Metodología</a></nav>
+</header>
 
-  <nav class="cards">
-    <a class="card" href="dashboard/"><b>Tablero Senda Hídrica →</b><span>Gráficas de reservas, senda, aportes, HSIN y vertimientos.</span></a>
-    <a class="card" href="https://github.com/arcomisp/Monitoreo-HSIN-XM/tree/main/reportes"><b>Histórico de briefs →</b><span>Un reporte por día, en Markdown y JSON.</span></a>
-    <a class="card" href="https://github.com/arcomisp/Monitoreo-HSIN-XM#readme"><b>Metodología →</b><span>Criterios de cálculo y umbrales de alerta.</span></a>
-  </nav>
+<section class="kpis" id="kpis" aria-label="Resumen"></section>
 
-  <section class="brief" id="brief"><p>Cargando el brief del día…</p></section>
+<section class="sec" id="brief-dia" aria-label="Brief del día">
+  <h2>Brief del día</h2>
+  <div class="brief" id="brief"><p>Cargando el brief del día…</p></div>
+</section>
 
-  <footer>
-    Análisis de <b>Alejandro Aroca</b>, Ingeniero Eléctrico · Consultor y Auditor Senior en Proyectos de Energía ·
-    <a href="https://www.linkedin.com/in/alejandro-aroca-ssecc" target="_blank" rel="noopener">LinkedIn</a><br>
-    Fuente: API pública de XM (servapibi.xm.com.co). Cifras sujetas a revisión por XM.
-  </footer>
+<section class="sec" aria-label="Semáforo de alertas">
+  <h2>Semáforo de alertas</h2>
+  <div class="semaforo" id="semaforo"></div>
+  <p class="sem-note">Umbrales del análisis. Aportes del mes: verde ≥ 90 %, amarillo 70–90 %, rojo &lt; 70 %. Brecha con la senda: verde ≥ 0, amarillo 0 a −5 pp, rojo &lt; −5 pp. Margen sobre la CAR: verde &gt; 20 pp, amarillo 10–20 pp, rojo &lt; 10 pp. Tendencia de 30 días: verde ≥ 0, amarillo 0 a −3 pp, rojo &lt; −3 pp. HSIN (aportes de las últimas 4 semanas, Res. CREG 209 de 2020): normal ≥ 90 %, vigilancia &lt; 90 %. Aportes frente a la Hidrología 95 % (caudal que se supera en 95 de cada 100 años): verde ≥ 110 %, amarillo 100–110 %, rojo &lt; 100 %. La generación térmica y la disponibilidad de gas no están incluidas porque XM no las trae en estos archivos.</p>
+</section>
+
+<section class="sec">
+  <h2>Aportes Naturales (HSIN) en 2026</h2>
+  <p id="txt5"></p>
+  <div class="card">
+    <div class="legend"><span><i class="sw" style="background:var(--water)"></i>Aportes Naturales · HSIN (últimas 4 semanas)</span><span><i class="sw dash"></i>Aportes del mes (acumulado desde el día 1)</span><span><i class="sw box" style="background:var(--risk)"></i>Condición de vigilancia (HSIN &lt; 90 %)</span></div>
+    <div class="cv"><canvas id="c9" aria-label="HSIN diario de 2026: aportes del SIN de las últimas cuatro semanas como porcentaje de la media histórica" role="img"></canvas></div>
+    <p class="note">HSIN = Aportes Naturales del SIN de los últimos 28 días ÷ su media histórica (Res. CREG 209 de 2020). Se aproxima excluyendo las desviaciones EEPPM, Batatas y Chivor, como hace XM; al 1-oct da 61,24 % frente a 61,27 % publicado. Arranca el 28 de enero porque necesita 4 semanas de datos. La línea punteada es el acumulado del mes de los Aportes, que vuelve a empezar cada día 1; el HSIN usa los Aportes Naturales y suma siempre 28 días.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Aportes frente a Aportes Naturales</h2>
+  <p>XM publica dos series de aportes. La diferencia son las desviaciones: agua que se trae por túneles y trasvases desde ríos que no alimentan naturalmente al embalse.</p>
+  <div class="card">
+    <div class="an-grid">
+      <div class="an-def" style="--st:var(--water)"><b>Aportes</b><span style="font-size:13.5px;color:var(--ink-2)">El agua que llega a las plantas, incluidas las desviaciones. Es la serie del seguimiento mensual de este tablero.</span><br><span class="f">= caudal natural + desviaciones</span></div>
+      <div class="an-def" style="--st:var(--c3)"><b>Aportes Naturales</b><span style="font-size:13.5px;color:var(--ink-2)">Solo el caudal natural de los ríos. Las desviaciones se excluyen, en lo observado y en la media histórica, y no se reasignan a otra región. Es la base del HSIN.</span><br><span class="f">= solo el caudal natural</span></div>
+    </div>
+    <div class="tw"><table class="data" aria-label="Aportes y Aportes Naturales por región, IDO de XM al 1 de octubre de 2026">
+      <thead><tr><th>Región · IDO 1 oct 2026</th><th>Aportes (GWh/d)</th><th>Naturales (GWh/d)</th><th>Δ</th><th style="text-align:left">Qué explica la diferencia</th></tr></thead>
+      <tbody>
+        <tr><td>Antioquia</td><td>62,08</td><td>60,53</td><td class="dn">−1,55</td><td style="text-align:left;font-family:var(--f-body)">Desviación EEPPM (Nechí, Pajarito, Dolores)</td></tr>
+        <tr><td>Oriente</td><td>20,30</td><td>18,88</td><td class="dn">−1,42</td><td style="text-align:left;font-family:var(--f-body)">Desviaciones Batatas y Chivor</td></tr>
+        <tr><td>Caldas</td><td>10,63</td><td>12,07</td><td class="up">+1,44</td><td style="text-align:left;font-family:var(--f-body)">Caudal naturalizado (Guarino / La Miel)*</td></tr>
+        <tr><td>Centro</td><td>34,89</td><td>35,54</td><td class="up">+0,65</td><td style="text-align:left;font-family:var(--f-body)">Posible naturalización del río Bogotá*</td></tr>
+        <tr><td>Caribe y Valle</td><td colspan="2" style="text-align:center">iguales</td><td>0</td><td style="text-align:left;font-family:var(--f-body)">Sin desviaciones</td></tr>
+        <tr><td><b>SIN</b></td><td><b>140,64</b></td><td><b>139,76</b></td><td class="dn"><b>−0,88</b></td><td style="text-align:left;font-family:var(--f-body)">Media 247,47 → 240,14 · 56,8 % → 58,2 %</td></tr>
+      </tbody></table></div>
+    <p class="note">Ninguna de las dos series incluye el agua ya almacenada: ambas son flujo; el agua guardada es la reserva. *Caldas y Centro: interpretación propia, por confirmar con el detalle por río del IDO. Tabla fija con el IDO del 1 de octubre de 2026; no se actualiza automáticamente.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Reserva real frente a la senda y la CAR</h2>
+  <p id="txt1"></p>
+  <div class="card">
+    <div class="legend"><span><i class="sw" style="background:var(--water)"></i>Reserva real</span><span><i class="sw dash"></i>Senda de referencia CREG</span><span><i class="sw" style="background:var(--car)"></i>CAR (nivel mínimo)</span><span><i class="sw box" style="background:var(--risk)"></i>Zona bajo la CAR</span><span><i class="sw dot"></i>Reserva + vertimientos acumulados (máximo teórico)</span></div>
+    <div class="cv"><canvas id="c1" aria-label="Reserva útil diaria del SIN frente a la senda CREG y la CAR, enero a noviembre de 2026" role="img"></canvas></div>
+    <p class="note">La senda es diaria, interpolada a partir de resultados semanales. La CAR es semanal. Verano 2025-26 hasta el 30 de abril, Invierno 2026 desde el 1 de mayo. La línea verde punteada suma a la reserva real toda el agua vertida en el año (tope 100 %): es un máximo teórico, porque esa agua se vertió justamente porque esos embalses estaban llenos.</p>
+  </div>
+  <div class="card">
+    <div class="legend"><span><i class="sw box" style="background:var(--pos)"></i>Por encima de la senda</span><span><i class="sw box" style="background:var(--neg)"></i>Por debajo de la senda</span></div>
+    <div class="cv sm"><canvas id="c2" aria-label="Brecha diaria entre la reserva real y la senda CREG en puntos porcentuales" role="img"></canvas></div>
+    <p class="note">Brecha diaria = reserva real − senda (pp). Los cambios de capacidad útil (por ejemplo Ituango, 5 de octubre de 2026) mueven el porcentaje sin que cambie el agua almacenada.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Reserva y aportes en el tiempo</h2>
+  <p id="txt3"></p>
+  <div class="card">
+    <div class="legend"><span><i class="sw" style="background:var(--water)"></i>Reserva útil del SIN (%)</span></div>
+    <div class="cv sm"><canvas id="c5" aria-label="Reserva útil diaria del SIN" role="img"></canvas></div>
+    <div class="legend" style="margin-top:10px"><span><i class="sw" style="background:var(--water)"></i>Aportes SIN, promedio móvil de 7 días</span><span><i class="sw dash"></i>Media histórica de XM</span><span><i class="sw box" style="background:var(--risk)"></i>Déficit frente a la media</span><span><i class="sw box" style="background:var(--band)"></i>Exceso frente a la media</span></div>
+    <div class="cv sm"><canvas id="c6" aria-label="Aportes diarios del SIN frente a su media histórica en GWh por día" role="img"></canvas></div>
+    <p class="note">Los dos paneles comparten el eje de fechas. Al pasar el cursor por uno, el otro marca el mismo día. Los aportes son el flujo de agua que entra (GWh/día) y la reserva es el agua almacenada (% de la capacidad útil). La reserva cae cuando lo que se turbina y se vierte supera lo que entra.</p>
+  </div>
+  <div class="card">
+    <div class="legend"><span><i class="sw box" style="background:var(--pos)"></i>La reserva ganó energía en el mes</span><span><i class="sw box" style="background:var(--neg)"></i>La reserva perdió energía en el mes</span></div>
+    <div class="cv sm"><canvas id="c7" aria-label="Variación mensual de la reserva en GWh y aportes del mes como porcentaje de la media" role="img"></canvas></div>
+    <p class="note">Variación de la reserva entre cierres de mes (GWh almacenados, sin efecto de cambios de capacidad). Debajo de cada mes aparece el aporte del SIN como % de su media histórica.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Vertimientos: agua que se perdió por falta de espacio</h2>
+  <p id="txt4"></p>
+  <div class="card">
+    <div class="legend" id="vleg"></div>
+    <div class="cv sm"><canvas id="c8" aria-label="Vertimientos mensuales por embalse en GWh" role="img"></canvas></div>
+    <p class="note">Vertimiento: agua que sale del embalse sin pasar por las turbinas porque el embalse está lleno o el caudal supera la capacidad de generación. Se expresa en GWh equivalentes.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Aportes hídricos frente a la media histórica</h2>
+  <p id="txt2"></p>
+  <div class="grid2">
+    <div class="card">
+      <div class="legend"><span><i class="sw box" style="background:var(--pos)"></i>Sobre la media</span><span><i class="sw box" style="background:var(--neg)"></i>Bajo la media</span></div>
+      <div class="cv sm"><canvas id="c3" aria-label="Aportes del SIN por mes como porcentaje de la media histórica" role="img"></canvas></div>
+      <p class="note">Promedio acumulado del mes contra la media histórica de XM del mismo mes (GWh/día). El último mes es parcial.</p>
+    </div>
+    <div class="card">
+      <div class="legend"><span><i class="sw" style="background:var(--water)"></i>Aporte real</span><span><i class="sw dash"></i>Promedio del escenario</span><span><i class="sw box" style="background:var(--band)"></i>Rango mín–máx de 100 series</span></div>
+      <div class="cv sm"><canvas id="c4" aria-label="Aportes semanales reales del SIN frente al escenario hidrológico de la senda" role="img"></canvas></div>
+      <p class="note">Promedio semanal en GWh/día. El escenario de la senda supone una hidrología más seca que la media histórica de XM.</p>
+    </div>
+  </div>
+  <div class="card heat">
+    <div class="scale"><span>% de la media histórica:</span><span>40</span><b id="scalebar"></b><span>160+</span><span style="margin-left:8px">100 = normal</span></div>
+    <table id="heat" aria-label="Aportes por región y mes como porcentaje de la media histórica"></table>
+    <p class="note">Si un río no reporta datos en un mes, su media histórica sí cuenta en el cálculo (criterio XM). Pasa el cursor por una celda para ver los GWh/día.</p>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Cortes de fin de mes</h2>
+  <div class="card tw">
+    <table class="data" id="cuts"><thead><tr><th>Corte</th><th>Reserva (GWh)</th><th>Capacidad útil (GWh)</th><th>Reserva útil</th><th>Δ pp</th><th>Δ GWh</th><th>Senda</th><th>Brecha</th><th>Vertido en el mes (GWh)</th></tr></thead><tbody></tbody></table>
+    <p class="note">La capacidad útil cambió durante el año (Guavio +528 GWh el 30 de junio, Ituango +187 GWh el 5 de octubre). Por eso el Δ pp no siempre coincide con el Δ GWh. Vertido en el mes: agua que salió de los embalses sin generar, en GWh equivalentes<span id="vhasta"></span>.</p>
+  </div>
+</section>
+
+<footer>
+  <span><b style="color:var(--ink);font-weight:600">Alejandro Aroca</b> · Ingeniero Eléctrico · Consultor y Auditor Senior en Proyectos de Energía</span>
+  
+  <span>Miembro de UNIANDINOS, IEEE, ACIEM, SCI, CTP Energía SCI, SSECC, SIC y TED.</span>
+  <span>Fuente: XM (Sinergox, Hidrología: Aportes_Diario_2026, Aportes_Mensual_2026, Reservas_Diario_SIN_2026, Reservas_Diario_2026, Vertimientos_Diario_2026), Informe Diario de Operación (IDO) y documentos soporte de la Senda de Referencia Verano 2025-26 e Invierno 2026.</span>
+  <span id="corte"></span>
+</footer>
 </div>
+<div id="tip" role="tooltip"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
-fetch('reportes/ULTIMO.html', {cache: 'no-store'})
-  .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
-  .then(md => { document.getElementById('brief').innerHTML = md; })
-  .catch(() => { document.getElementById('brief').innerHTML = '<p>No se pudo cargar el brief. Ábrelo en <a href="reportes/ULTIMO.md">reportes/ULTIMO.md</a>.</p>'; });
+const D={"daily":[["2026-01-01",80.23,78.1,59.83,13553.3,80.23],["2026-01-02",80.05,77.89,59.83,13522.6,80.05],["2026-01-03",79.96,77.68,59.83,13507.9,79.96],["2026-01-04",79.92,77.46,59.83,13501.9,79.92],["2026-01-05",79.81,77.14,58.01,13483.0,79.82],["2026-01-06",79.94,76.81,58.01,13505.0,79.99],["2026-01-07",80.15,76.49,58.01,13540.8,80.25],["2026-01-08",79.9,76.16,58.01,13509.0,80.06],["2026-01-09",79.64,75.84,58.01,13464.2,79.85],["2026-01-10",79.57,75.51,58.01,13453.3,79.87],["2026-01-11",79.74,75.19,58.01,13480.5,80.12],["2026-01-12",80.1,74.78,55.7,13541.9,80.69],["2026-01-13",80.21,74.38,55.7,13560.3,81.07],["2026-01-14",80.32,73.97,55.7,13579.7,81.44],["2026-01-15",80.31,73.56,55.7,13578.2,81.64],["2026-01-16",80.21,73.16,55.7,13560.2,81.73],["2026-01-17",80.04,72.75,55.7,13531.3,81.72],["2026-01-18",79.85,72.35,55.7,13500.5,81.67],["2026-01-19",79.44,71.81,52.91,13430.1,81.37],["2026-01-20",78.99,71.28,52.91,13354.4,81.04],["2026-01-21",78.52,70.74,52.91,13274.4,80.66],["2026-01-22",78.04,70.21,52.91,13193.4,80.26],["2026-01-23",77.62,69.67,52.91,13122.4,79.92],["2026-01-24",77.36,69.13,52.91,13078.7,79.74],["2026-01-25",77.04,68.6,52.91,13024.4,79.49],["2026-01-26",76.8,68.03,50.33,12983.8,79.32],["2026-01-27",76.65,67.46,50.33,12958.6,79.26],["2026-01-28",76.52,66.89,50.33,12936.2,79.26],["2026-01-29",76.51,66.32,50.33,12934.8,79.37],["2026-01-30",76.33,65.75,50.33,12904.8,79.34],["2026-01-31",76.35,65.18,50.33,12907.5,79.49],["2026-02-01",76.84,64.61,50.33,12991.1,80.17],["2026-02-02",77.39,64.01,47.12,13084.1,81.07],["2026-02-03",77.3,63.4,47.12,13069.3,81.4],["2026-02-04",77.09,62.79,47.12,13023.3,81.61],["2026-02-05",76.65,62.19,47.12,12948.6,81.58],["2026-02-06",76.73,61.58,47.12,12962.1,81.98],["2026-02-07",76.67,60.97,47.12,12952.0,82.2],["2026-02-08",76.59,60.37,47.12,12938.7,82.42],["2026-02-09",76.3,59.76,44.6,12889.0,82.43],["2026-02-10",75.87,59.15,44.6,12818.0,82.29],["2026-02-11",75.39,58.55,44.6,12736.0,82.08],["2026-02-12",74.95,57.94,44.6,12661.1,81.84],["2026-02-13",74.54,57.33,44.6,12592.2,81.6],["2026-02-14",74.22,56.73,44.6,12539.2,81.47],["2026-02-15",74.15,56.12,44.6,12525.8,81.6],["2026-02-16",74.02,55.53,42.18,12503.9,81.72],["2026-02-17",73.86,54.94,42.18,12477.0,81.81],["2026-02-18",74.08,54.35,42.18,12514.8,82.24],["2026-02-19",73.89,53.76,42.18,12481.9,82.24],["2026-02-20",73.78,53.17,42.18,12464.5,82.35],["2026-02-21",73.65,52.58,42.18,12441.4,82.41],["2026-02-22",73.63,51.98,42.18,12438.5,82.61],["2026-02-23",73.59,51.44,40.35,12432.6,82.84],["2026-02-24",73.75,50.89,40.35,12458.5,83.32],["2026-02-25",73.79,50.34,40.35,12466.3,83.71],["2026-02-26",73.7,49.8,40.35,12451.2,84.0],["2026-02-27",73.37,49.25,40.35,12395.3,83.95],["2026-02-28",73.01,48.7,40.35,12333.2,83.82],["2026-03-01",72.69,48.16,40.35,12280.4,83.81],["2026-03-02",72.26,47.73,38.48,12206.6,83.57],["2026-03-03",71.8,47.29,38.48,12130.3,83.31],["2026-03-04",71.41,46.86,38.48,12063.4,83.09],["2026-03-05",70.98,46.43,38.48,11991.6,82.83],["2026-03-06",70.54,45.99,38.48,11916.4,82.58],["2026-03-07",70.18,45.56,38.48,11856.6,82.34],["2026-03-08",70.15,45.13,38.48,11851.1,82.45],["2026-03-09",69.78,44.74,36.57,11788.7,82.28],["2026-03-10",69.42,44.35,36.57,11726.9,82.07],["2026-03-11",69.09,43.97,36.57,11682.6,81.88],["2026-03-12",68.68,43.58,36.57,11612.9,81.62],["2026-03-13",68.28,43.19,36.57,11545.3,81.37],["2026-03-14",67.9,42.81,36.57,11480.3,81.13],["2026-03-15",67.59,42.42,36.57,11428.7,80.95],["2026-03-16",67.14,42.1,34.53,11351.6,80.62],["2026-03-17",66.69,41.78,34.53,11276.3,80.3],["2026-03-18",66.62,41.45,34.53,11264.5,80.37],["2026-03-19",66.36,41.13,34.53,11220.4,80.27],["2026-03-20",65.93,40.81,34.53,11148.1,79.98],["2026-03-21",65.62,40.49,34.53,11096.1,79.79],["2026-03-22",65.54,40.17,34.53,11082.1,79.82],["2026-03-23",65.38,39.87,33.57,11055.6,79.78],["2026-03-24",65.11,39.57,33.57,11008.7,79.63],["2026-03-25",64.8,39.28,33.57,10955.9,79.41],["2026-03-26",64.51,38.98,33.57,10906.9,79.18],["2026-03-27",64.31,38.68,33.57,10874.5,79.06],["2026-03-28",63.95,38.39,33.57,10812.5,78.79],["2026-03-29",63.77,38.09,33.57,10782.0,78.7],["2026-03-30",63.61,37.9,32.34,10755.1,78.62],["2026-03-31",63.44,37.7,32.34,10726.6,78.54],["2026-04-01",63.27,37.51,32.34,10698.3,78.44],["2026-04-02",63.34,37.32,32.34,10709.8,78.57],["2026-04-03",63.32,37.13,32.34,10706.2,78.59],["2026-04-04",63.17,36.93,32.34,10680.5,78.48],["2026-04-05",63.26,36.74,32.34,10696.6,78.61],["2026-04-06",62.9,36.55,31.59,10635.8,78.29],["2026-04-07",62.63,36.37,31.59,10589.1,78.06],["2026-04-08",62.81,36.18,31.59,10620.2,78.3],["2026-04-09",62.61,36.0,31.59,10585.9,78.16],["2026-04-10",62.26,35.81,31.59,10528.0,77.82],["2026-04-11",62.12,35.63,31.59,10503.9,77.68],["2026-04-12",61.92,35.44,31.59,10469.9,77.48],["2026-04-13",61.57,35.37,30.62,10411.2,77.13],["2026-04-14",61.32,35.31,30.62,10367.9,76.9],["2026-04-15",61.22,35.24,30.62,10349.5,76.84],["2026-04-16",61.63,35.17,30.62,10419.4,77.33],["2026-04-17",62.35,35.11,30.62,10539.8,78.17],["2026-04-18",62.66,35.04,30.62,10593.6,78.66],["2026-04-19",62.8,34.97,30.62,10616.4,78.93],["2026-04-20",62.73,35.0,30.28,10605.4,78.97],["2026-04-21",62.64,35.02,30.28,10590.4,78.98],["2026-04-22",62.47,35.05,30.28,10561.0,78.89],["2026-04-23",62.47,35.08,30.28,10560.6,78.97],["2026-04-24",62.54,35.1,30.28,10573.2,79.1],["2026-04-25",63.03,35.13,30.28,10656.1,79.63],["2026-04-26",63.56,35.15,30.28,10745.0,80.21],["2026-04-27",63.78,35.22,31.21,10781.5,80.48],["2026-04-28",63.93,35.29,31.21,10807.8,80.69],["2026-04-29",64.23,35.36,31.21,10857.7,81.06],["2026-04-30",64.03,35.43,31.21,10824.4,80.92],["2026-05-01",63.88,62.14,31.21,10814.4,80.76],["2026-05-02",64.38,62.47,31.21,10899.6,81.31],["2026-05-03",64.62,62.79,31.21,10940.7,81.6],["2026-05-04",64.96,62.91,32.16,10998.5,82.03],["2026-05-05",65.01,63.03,32.16,11006.0,82.16],["2026-05-06",65.33,63.14,32.16,11060.5,82.52],["2026-05-07",65.3,63.26,32.16,11055.5,82.53],["2026-05-08",65.17,63.38,32.16,11033.7,82.42],["2026-05-09",64.96,63.5,32.16,10998.6,82.21],["2026-05-10",64.75,63.62,32.16,10962.5,82.0],["2026-05-11",64.47,63.84,33.19,10915.8,81.72],["2026-05-12",64.46,64.06,33.19,10912.8,81.7],["2026-05-13",64.56,64.28,33.19,10929.5,81.82],["2026-05-14",64.68,64.5,33.19,10951.3,81.95],["2026-05-15",64.54,64.71,33.19,10927.7,81.81],["2026-05-16",64.56,64.93,33.19,10930.2,81.83],["2026-05-17",64.69,65.15,33.19,10952.8,81.96],["2026-05-18",64.79,65.46,33.53,10969.6,82.06],["2026-05-19",65.25,65.76,33.53,11047.9,82.52],["2026-05-20",65.23,66.06,33.53,11043.4,82.49],["2026-05-21",65.14,66.37,33.53,11028.7,82.41],["2026-05-22",65.59,66.67,33.53,11104.9,82.86],["2026-05-23",65.95,66.97,33.53,11164.9,83.21],["2026-05-24",66.33,67.27,33.53,11230.5,83.6],["2026-05-25",66.43,67.56,35.49,11246.5,83.69],["2026-05-26",66.71,67.84,35.49,11294.3,83.98],["2026-05-27",67.41,68.12,35.49,11413.2,84.68],["2026-05-28",67.87,68.4,35.49,11490.4,85.13],["2026-05-29",68.44,68.69,35.49,11586.6,85.7],["2026-05-30",68.78,68.97,35.49,11644.0,86.04],["2026-05-31",69.07,69.25,35.49,11693.5,86.33],["2026-06-01",69.11,69.52,37.22,11700.7,86.38],["2026-06-02",69.34,69.79,37.22,11740.2,86.61],["2026-06-03",69.5,70.06,37.22,11766.7,86.77],["2026-06-04",69.7,70.33,37.22,11801.0,86.97],["2026-06-05",70.45,70.6,37.22,11927.6,87.72],["2026-06-06",71.04,70.86,37.22,12027.5,88.31],["2026-06-07",71.86,71.13,37.22,12166.1,89.13],["2026-06-08",72.82,71.39,38.84,12328.5,90.09],["2026-06-09",73.26,71.64,38.84,12403.1,90.63],["2026-06-10",73.7,71.89,38.84,12477.9,91.19],["2026-06-11",73.58,72.15,38.84,12456.6,91.1],["2026-06-12",73.28,72.4,38.84,12406.3,90.82],["2026-06-13",73.05,72.65,38.84,12367.2,90.61],["2026-06-14",73.34,72.9,38.84,12417.0,90.9],["2026-06-15",73.44,73.14,40.1,12434.4,91.01],["2026-06-16",73.55,73.37,40.1,12453.2,91.12],["2026-06-17",73.62,73.6,40.1,12464.4,91.18],["2026-06-18",73.93,73.83,40.1,12502.3,91.51],["2026-06-19",74.14,74.06,40.1,12537.1,91.72],["2026-06-20",74.26,74.29,40.1,12558.0,91.84],["2026-06-21",74.64,74.52,40.1,12623.4,92.22],["2026-06-22",74.76,74.72,42.71,12643.9,92.35],["2026-06-23",75.38,74.92,42.71,12748.7,92.97],["2026-06-24",75.3,75.12,42.71,12734.1,92.88],["2026-06-25",75.04,75.32,42.71,12690.3,92.62],["2026-06-26",74.86,75.52,42.71,12660.4,92.44],["2026-06-27",74.74,75.73,42.71,12639.2,92.32],["2026-06-28",75.16,75.93,42.71,12710.4,92.74],["2026-06-29",75.37,76.18,44.17,12746.9,92.98],["2026-06-30",76.42,76.44,44.17,13327.5,93.53],["2026-07-01",76.46,76.69,44.17,13335.3,93.61],["2026-07-02",76.84,76.95,44.17,13401.5,94.02],["2026-07-03",77.39,77.21,44.17,13496.1,94.56],["2026-07-04",77.9,77.46,44.17,13585.7,95.07],["2026-07-05",78.23,77.72,44.17,13643.8,95.41],["2026-07-06",78.26,77.94,45.69,13648.3,95.43],["2026-07-07",78.17,78.15,45.69,13633.2,95.35],["2026-07-08",78.0,78.37,45.69,13604.2,95.18],["2026-07-09",78.41,78.59,45.69,13675.0,95.59],["2026-07-10",78.44,78.8,45.69,13680.3,95.7],["2026-07-11",78.51,79.02,45.69,13692.0,95.83],["2026-07-12",78.79,79.24,45.69,13741.5,96.11],["2026-07-13",78.91,79.4,47.97,13762.2,96.23],["2026-07-14",78.79,79.57,47.97,13741.2,96.11],["2026-07-15",78.87,79.74,47.97,13755.0,96.19],["2026-07-16",78.82,79.9,47.97,13746.3,96.14],["2026-07-17",78.65,80.07,47.97,13716.2,95.96],["2026-07-18",78.73,80.24,47.97,13730.5,96.05],["2026-07-19",78.94,80.4,47.97,13767.6,96.64],["2026-07-20",79.28,80.55,48.9,13825.9,97.24],["2026-07-21",79.41,80.7,48.9,13850.2,97.43],["2026-07-22",79.31,80.85,48.9,13832.6,97.33],["2026-07-23",80.18,81.0,48.9,13984.3,98.65],["2026-07-24",80.49,81.14,48.9,14037.5,99.47],["2026-07-25",80.58,81.29,48.9,14053.4,99.59],["2026-07-26",80.82,81.44,48.9,14094.8,99.83],["2026-07-27",80.66,81.53,49.58,14067.3,99.71],["2026-07-28",80.4,81.62,49.58,14022.8,99.45],["2026-07-29",80.3,81.71,49.58,14005.3,99.35],["2026-07-30",80.23,81.8,49.58,13995.6,99.27],["2026-07-31",79.99,81.88,49.58,13954.7,99.04],["2026-08-01",79.72,81.97,49.58,13906.9,98.76],["2026-08-02",79.51,82.06,49.58,13869.5,98.55],["2026-08-03",79.08,82.11,49.97,13794.7,98.12],["2026-08-04",78.82,82.17,49.97,13749.6,97.86],["2026-08-05",78.91,82.22,49.97,13785.5,97.92],["2026-08-06",78.88,82.27,49.97,13795.2,97.88],["2026-08-07",78.77,82.32,49.97,13777.9,97.76],["2026-08-08",78.78,82.37,49.97,13779.3,97.77],["2026-08-09",78.95,82.42,49.97,13809.1,97.94],["2026-08-10",78.78,82.43,50.85,13780.1,97.78],["2026-08-11",78.52,82.44,50.85,13734.5,97.52],["2026-08-12",78.22,82.45,50.85,13681.7,97.23],["2026-08-13",77.88,82.46,50.85,13622.8,96.89],["2026-08-14",77.68,82.46,50.85,13587.2,96.69],["2026-08-15",77.67,82.47,50.85,13586.2,96.68],["2026-08-16",77.97,82.48,50.85,13638.0,96.99],["2026-08-17",79.18,82.48,51.34,13849.8,98.38],["2026-08-18",79.57,82.47,51.34,13917.4,98.97],["2026-08-19",79.5,82.47,51.34,13906.3,98.91],["2026-08-20",79.43,82.46,51.34,13892.7,98.83],["2026-08-21",79.25,82.46,51.34,13861.9,98.68],["2026-08-22",79.11,82.45,51.34,13836.7,98.95],["2026-08-23",79.15,82.45,51.34,13845.0,99.27],["2026-08-24",79.05,82.35,51.91,13826.2,99.36],["2026-08-25",78.76,82.25,51.91,13776.1,99.13],["2026-08-26",78.71,82.15,51.91,13767.8,99.13],["2026-08-27",78.5,82.05,51.91,13730.1,98.93],["2026-08-28",78.47,81.94,51.91,13724.9,98.94],["2026-08-29",78.59,81.84,51.91,13746.4,99.18],["2026-08-30",79.05,81.74,51.91,13826.7,99.97],["2026-08-31",79.38,81.6,52.26,13884.7,100.0],["2026-09-01",79.54,81.45,52.26,13911.8,100.0],["2026-09-02",79.96,81.31,52.26,13986.1,100.0],["2026-09-03",79.95,81.17,52.26,13984.4,100.0],["2026-09-04",79.87,81.02,52.26,13969.7,100.0],["2026-09-05",79.73,80.88,52.26,13935.3,100.0],["2026-09-06",79.61,80.74,52.26,13914.2,100.0],["2026-09-07",79.42,80.58,52.67,13879.9,100.0],["2026-09-08",79.23,80.43,52.67,13847.3,100.0],["2026-09-09",79.02,80.28,52.67,13810.1,100.0],["2026-09-10",78.88,80.13,52.67,13786.6,100.0],["2026-09-11",79.14,79.98,52.67,13831.0,100.0],["2026-09-12",79.04,79.82,52.67,13814.3,100.0],["2026-09-13",79.27,79.67,52.67,13854.1,100.0],["2026-09-14",79.08,79.53,52.97,13821.9,100.0],["2026-09-15",79.03,79.38,52.97,13812.5,100.0],["2026-09-16",78.92,79.23,52.97,13793.3,100.0],["2026-09-17",78.7,79.09,52.97,13755.5,100.0],["2026-09-18",78.35,78.94,52.97,13693.5,99.87],["2026-09-19",78.14,78.8,52.97,13656.7,99.66],["2026-09-20",78.15,78.65,52.97,13658.2,99.67],["2026-09-21",77.89,78.59,52.47,13612.6,99.41],["2026-09-22",77.55,78.53,52.47,13553.6,99.07],["2026-09-23",77.21,78.47,52.47,13494.6,98.73],["2026-09-24",76.84,78.41,52.47,13429.8,98.36],["2026-09-25",76.58,78.35,52.47,13384.6,98.1],["2026-09-26",76.32,78.29,52.47,13338.3,97.84],["2026-09-27",76.46,78.23,52.47,13363.6,97.99],["2026-09-28",76.76,78.18,52.38,13416.1,98.29],["2026-09-29",76.56,78.13,52.38,13381.4,98.09],["2026-09-30",76.26,78.09,52.38,13328.5,97.78],["2026-10-01",76.15,78.04,52.38,13308.5,97.67],["2026-10-02",76.18,77.99,52.38,13313.8,97.7],["2026-10-03",76.26,77.94,52.38,13318.5,97.79],["2026-10-04",76.22,77.89,52.38,13311.6,97.76],["2026-10-05",75.16,77.89,51.98,13267.3,96.47],["2026-10-06",74.95,77.88,51.98,13186.3,96.33],["2026-10-07",74.84,77.87,51.98,13215.1,96.14],["2026-10-08",74.82,77.86,51.98,13212.5,96.13],["2026-10-09",null,77.86,51.98,null,null],["2026-10-10",null,77.85,51.98,null,null],["2026-10-11",null,77.84,51.98,null,null],["2026-10-12",null,77.87,53.13,null,null],["2026-10-13",null,77.9,53.13,null,null],["2026-10-14",null,77.93,53.13,null,null],["2026-10-15",null,77.95,53.13,null,null],["2026-10-16",null,77.98,53.13,null,null],["2026-10-17",null,78.01,53.13,null,null],["2026-10-18",null,78.04,53.13,null,null],["2026-10-19",null,78.11,54.21,null,null],["2026-10-20",null,78.18,54.21,null,null],["2026-10-21",null,78.25,54.21,null,null],["2026-10-22",null,78.33,54.21,null,null],["2026-10-23",null,78.4,54.21,null,null],["2026-10-24",null,78.47,54.21,null,null],["2026-10-25",null,78.54,54.21,null,null],["2026-10-26",null,78.7,55.44,null,null],["2026-10-27",null,78.86,55.44,null,null],["2026-10-28",null,79.02,55.44,null,null],["2026-10-29",null,79.18,55.44,null,null],["2026-10-30",null,79.34,55.44,null,null],["2026-10-31",null,79.5,55.44,null,null],["2026-11-01",null,79.66,55.44,null,null],["2026-11-02",null,79.82,56.6,null,null],["2026-11-03",null,79.98,56.6,null,null],["2026-11-04",null,80.14,56.6,null,null],["2026-11-05",null,80.31,56.6,null,null],["2026-11-06",null,80.47,56.6,null,null],["2026-11-07",null,80.63,56.6,null,null],["2026-11-08",null,80.8,56.6,null,null],["2026-11-09",null,80.93,59.23,null,null],["2026-11-10",null,81.06,59.23,null,null],["2026-11-11",null,81.19,59.23,null,null],["2026-11-12",null,81.32,59.23,null,null],["2026-11-13",null,81.45,59.23,null,null],["2026-11-14",null,81.58,59.23,null,null],["2026-11-15",null,81.71,59.23,null,null],["2026-11-16",null,81.77,61.95,null,null],["2026-11-17",null,81.84,61.95,null,null],["2026-11-18",null,81.91,61.95,null,null],["2026-11-19",null,81.98,61.95,null,null],["2026-11-20",null,82.05,61.95,null,null],["2026-11-21",null,82.12,61.95,null,null],["2026-11-22",null,82.19,61.95,null,null],["2026-11-23",null,82.26,63.23,null,null],["2026-11-24",null,82.33,63.23,null,null],["2026-11-25",null,82.4,63.23,null,null],["2026-11-26",null,82.47,63.23,null,null],["2026-11-27",null,82.54,63.23,null,null],["2026-11-28",null,82.61,63.23,null,null],["2026-11-29",null,82.69,63.23,null,null],["2026-11-30",null,82.55,62.87,null,null]],"heat":{"ANTIOQUIA":[[131.65,107.94,81.99],[165.45,121.64,73.52],[113.51,95.26,83.92],[99.02,111.72,112.83],[56.89,80.26,141.09],[71.56,90.16,126.0],[54.06,56.11,103.8],[50.77,50.62,99.71],[45.37,51.56,113.63],[40.03,54.12,135.2]],"CALDAS":[[123.34,12.42,10.07],[150.46,14.82,9.85],[99.18,10.86,10.95],[85.58,10.92,12.76],[50.19,6.77,13.49],[61.07,6.18,10.12],[49.12,3.64,7.41],[55.91,3.25,5.82],[45.4,3.91,8.62],[50.58,6.26,12.37]],"CARIBE":[[213.76,4.04,1.89],[773.91,10.68,1.38],[123.87,1.92,1.55],[126.43,3.54,2.8],[68.8,3.33,4.84],[57.87,3.2,5.53],[69.23,3.87,5.59],[71.95,3.71,5.16],[78.0,3.82,4.9],[111.01,5.64,5.08]],"CENTRO":[[173.92,35.95,20.67],[235.29,49.27,20.94],[118.61,33.4,28.16],[97.73,45.14,46.19],[81.43,48.58,59.66],[85.56,48.88,57.13],[92.72,48.9,52.74],[91.39,39.39,43.1],[78.66,28.58,36.33],[68.87,34.61,50.25]],"ORIENTE":[[118.94,9.61,8.08],[106.41,8.8,8.27],[53.42,7.57,14.17],[77.97,23.93,30.69],[129.06,63.65,49.32],[81.53,55.58,68.17],[110.26,79.87,72.44],[112.1,62.89,56.1],[117.58,43.87,37.31],[71.05,22.15,31.18]],"VALLE":[[144.67,21.83,15.09],[192.03,25.54,13.3],[139.43,18.74,13.44],[93.58,14.58,15.58],[76.04,12.09,15.9],[68.31,9.03,13.22],[69.88,7.1,10.16],[63.36,5.05,7.97],[63.69,5.09,7.99],[72.72,9.65,13.27]],"SIN":[[139.18,191.77,137.79],[181.33,230.76,127.26],[110.22,167.74,152.19],[95.01,209.84,220.85],[75.51,214.68,284.3],[76.04,213.04,280.17],[79.12,199.49,252.14],[75.7,164.92,217.86],[65.66,136.83,208.39],[53.51,132.42,247.47]]},"weekly":[["2026-04-27",237.6,123.3,208.8,364.0],["2026-05-04",205.4,130.1,231.1,453.8],["2026-05-11",182.2,141.1,249.7,458.8],["2026-05-18",210.3,139.9,255.4,399.9],["2026-05-25",257.0,139.1,255.1,372.1],["2026-06-01",243.7,129.0,257.9,411.9],["2026-06-08",228.9,87.2,252.8,469.7],["2026-06-15",194.3,129.2,243.8,517.2],["2026-06-22",181.2,128.5,241.7,558.5],["2026-06-29",232.0,110.2,235.9,415.9],["2026-07-06",189.5,121.6,231.6,398.9],["2026-07-13",182.6,129.8,223.0,345.8],["2026-07-20",233.6,112.3,216.9,335.5],["2026-07-27",147.3,110.4,205.7,303.7],["2026-08-03",138.6,104.5,196.4,303.2],["2026-08-10",123.3,96.9,192.9,336.2],["2026-08-17",220.8,104.6,184.5,299],["2026-08-24",182.5,92.5,169.4,239.0],["2026-08-31",190.2,88.9,162.8,234.5],["2026-09-07",132.9,87.4,161.4,277.0],["2026-09-14",124.0,89.6,162.2,248.1],["2026-09-21",107.5,98.2,178.8,278.0],["2026-09-28",143.9,81.7,176.1,257.1]],"cuts":[["2026-01-31",12907.5,16906.5,76.35,null,null,532.0],["2026-02-28",12333.2,16893.6,73.01,-3.34,-574.3,1295.3],["2026-03-31",10726.6,16908.5,63.44,-9.57,-1606.6,725.8],["2026-04-30",10824.4,16905.4,64.03,0.59,97.8,302.4],["2026-05-31",11693.5,16930.5,69.07,5.04,869.1,67.7],["2026-06-30",13327.5,17440.2,76.42,7.35,1634.0,60.4],["2026-07-31",13954.7,17444.8,79.99,3.57,627.2,338.2],["2026-08-31",13884.7,17491.4,79.38,-0.61,-70.0,344.2],["2026-09-30",13328.5,17477.7,76.26,-3.12,-556.2,95.8],["2026-10-08",13212.5,17658.1,74.82,-1.44,-116.0,null]],"apd":[["2026-01-01",127.54,137.79],["2026-01-02",137.38,137.79],["2026-01-03",148.73,137.79],["2026-01-04",148.35,137.79],["2026-01-05",169.2,137.79],["2026-01-06",210.89,137.79],["2026-01-07",235.28,137.79],["2026-01-08",177.5,137.79],["2026-01-09",178.43,137.79],["2026-01-10",186.97,137.79],["2026-01-11",225.12,137.79],["2026-01-12",285.39,137.79],["2026-01-13",289.51,137.79],["2026-01-14",275.17,137.79],["2026-01-15",258.04,137.79],["2026-01-16",240.4,137.79],["2026-01-17",197.8,137.79],["2026-01-18",170.13,137.79],["2026-01-19",156.77,137.79],["2026-01-20",152.41,137.79],["2026-01-21",147.56,137.79],["2026-01-22",156.25,137.79],["2026-01-23",152.73,137.79],["2026-01-24",150.01,137.79],["2026-01-25",141.9,137.79],["2026-01-26",176.47,137.79],["2026-01-27",192.2,137.79],["2026-01-28",208.18,137.79],["2026-01-29",223.75,137.79],["2026-01-30",184.96,137.79],["2026-01-31",239.69,137.79],["2026-02-01",290.31,127.26],["2026-02-02",344.06,127.26],["2026-02-03",273.37,127.26],["2026-02-04",240.49,127.26],["2026-02-05",204.99,127.26],["2026-02-06",261.93,127.26],["2026-02-07",227.95,127.26],["2026-02-08",210.94,127.26],["2026-02-09",213.45,127.26],["2026-02-10",186.63,127.26],["2026-02-11",180.74,127.26],["2026-02-12",175.59,127.26],["2026-02-13",177.78,127.26],["2026-02-14",184.53,127.26],["2026-02-15",197.97,127.26],["2026-02-16",213.45,127.26],["2026-02-17",225.92,127.26],["2026-02-18",282.56,127.26],["2026-02-19",214.61,127.26],["2026-02-20",232.28,127.26],["2026-02-21",214.7,127.26],["2026-02-22",213.37,127.26],["2026-02-23",263.32,127.26],["2026-02-24",286.06,127.26],["2026-02-25",297.28,127.26],["2026-02-26",246.01,127.26],["2026-02-27",207.48,127.26],["2026-02-28",193.51,127.26],["2026-03-01",181.59,152.19],["2026-03-02",181.05,152.19],["2026-03-03",173.93,152.19],["2026-03-04",178.19,152.19],["2026-03-05",178.44,152.19],["2026-03-06",174.08,152.19],["2026-03-07",162.41,152.19],["2026-03-08",196.24,152.19],["2026-03-09",188.65,152.19],["2026-03-10",180.29,152.19],["2026-03-11",189.42,152.19],["2026-03-12",177.49,152.19],["2026-03-13",165.01,152.19],["2026-03-14",144.61,152.19],["2026-03-15",134.24,152.19],["2026-03-16",135.9,152.19],["2026-03-17",137.48,152.19],["2026-03-18",198.98,152.19],["2026-03-19",165.27,152.19],["2026-03-20",140.03,152.19],["2026-03-21",136.31,152.19],["2026-03-22",156.18,152.19],["2026-03-23",154.99,152.19],["2026-03-24",162.05,152.19],["2026-03-25",160.26,152.19],["2026-03-26",155.61,152.19],["2026-03-27",177.73,152.19],["2026-03-28",166.0,152.19],["2026-03-29",163.6,152.19],["2026-03-30",194.56,152.19],["2026-03-31",189.48,152.19],["2026-04-01",174.19,220.85],["2026-04-02",198.53,220.85],["2026-04-03",165.77,220.85],["2026-04-04",162.5,220.85],["2026-04-05",194.34,220.85],["2026-04-06",151.86,220.85],["2026-04-07",174.26,220.85],["2026-04-08",218.97,220.85],["2026-04-09",172.45,220.85],["2026-04-10",152.13,220.85],["2026-04-11",169.28,220.85],["2026-04-12",130.92,220.85],["2026-04-13",143.64,220.85],["2026-04-14",153.49,220.85],["2026-04-15",213.01,220.85],["2026-04-16",285.58,220.85],["2026-04-17",377.19,220.85],["2026-04-18",284.91,220.85],["2026-04-19",224.6,220.85],["2026-04-20",206.01,220.85],["2026-04-21",200.42,220.85],["2026-04-22",191.96,220.85],["2026-04-23",211.23,220.85],["2026-04-24",217.91,220.85],["2026-04-25",262.55,220.85],["2026-04-26",263.91,220.85],["2026-04-27",250.73,220.85],["2026-04-28",258.02,220.85],["2026-04-29",286.76,220.85],["2026-04-30",198.0,220.85],["2026-05-01",175.54,284.3],["2026-05-02",287.98,284.3],["2026-05-03",206.27,284.3],["2026-05-04",268.64,284.3],["2026-05-05",230.63,284.3],["2026-05-06",261.65,284.3],["2026-05-07",204.39,284.3],["2026-05-08",173.27,284.3],["2026-05-09",155.13,284.3],["2026-05-10",144.44,284.3],["2026-05-11",172.06,284.3],["2026-05-12",196.2,284.3],["2026-05-13",192.07,284.3],["2026-05-14",188.51,284.3],["2026-05-15",163.13,284.3],["2026-05-16",178.65,284.3],["2026-05-17",185.07,284.3],["2026-05-18",164.09,284.3],["2026-05-19",254.11,284.3],["2026-05-20",160.89,284.3],["2026-05-21",170.57,284.3],["2026-05-22",272.84,284.3],["2026-05-23",231.3,284.3],["2026-05-24",218.43,284.3],["2026-05-25",203.99,284.3],["2026-05-26",237.78,284.3],["2026-05-27",325.85,284.3],["2026-05-28",274.8,284.3],["2026-05-29",308.05,284.3],["2026-05-30",233.77,284.3],["2026-05-31",214.96,284.3],["2026-06-01",201.99,280.17],["2026-06-02",205.69,280.17],["2026-06-03",219.27,280.17],["2026-06-04",222.88,280.17],["2026-06-05",315.47,280.17],["2026-06-06",266.87,280.17],["2026-06-07",273.93,280.17],["2026-06-08",325.61,280.17],["2026-06-09",320.42,280.17],["2026-06-10",257.1,280.17],["2026-06-11",193.26,280.17],["2026-06-12",159.42,280.17],["2026-06-13",148.97,280.17],["2026-06-14",197.83,280.17],["2026-06-15",185.3,280.17],["2026-06-16",193.2,280.17],["2026-06-17",193.03,280.17],["2026-06-18",213.38,280.17],["2026-06-19",198.16,280.17],["2026-06-20",177.58,280.17],["2026-06-21",199.56,280.17],["2026-06-22",186.78,280.17],["2026-06-23",280.45,280.17],["2026-06-24",161.5,280.17],["2026-06-25",139.22,280.17],["2026-06-26",139.13,280.17],["2026-06-27",143.49,280.17],["2026-06-28",217.6,280.17],["2026-06-29",202.33,280.17],["2026-06-30",251.81,280.17],["2026-07-01",182.31,252.14],["2026-07-02",244.52,252.14],["2026-07-03",279.18,252.14],["2026-07-04",258.16,252.14],["2026-07-05",205.94,252.14],["2026-07-06",184.8,252.14],["2026-07-07",171.75,252.14],["2026-07-08",150.97,252.14],["2026-07-09",243.14,252.14],["2026-07-10",206.7,252.14],["2026-07-11",169.2,252.14],["2026-07-12",200.01,252.14],["2026-07-13",168.37,252.14],["2026-07-14",152.32,252.14],["2026-07-15",197.82,252.14],["2026-07-16",171.62,252.14],["2026-07-17",147.93,252.14],["2026-07-18",172.92,252.14],["2026-07-19",267.56,252.14],["2026-07-20",228.97,252.14],["2026-07-21",180.85,252.14],["2026-07-22",156.55,252.14],["2026-07-23",400.9,252.14],["2026-07-24",296.53,252.14],["2026-07-25",171.47,252.14],["2026-07-26",199.8,252.14],["2026-07-27",158.44,252.14],["2026-07-28",136.88,252.14],["2026-07-29",145.49,252.14],["2026-07-30",178.26,252.14],["2026-07-31",154.7,252.14],["2026-08-01",130.69,217.86],["2026-08-02",126.38,217.86],["2026-08-03",114.57,217.86],["2026-08-04",117.57,217.86],["2026-08-05",177.83,217.86],["2026-08-06",142.73,217.86],["2026-08-07",127.2,217.86],["2026-08-08",136.48,217.86],["2026-08-09",153.63,217.86],["2026-08-10",114.62,217.86],["2026-08-11",108.16,217.86],["2026-08-12",106.04,217.86],["2026-08-13",103.83,217.86],["2026-08-14",115.4,217.86],["2026-08-15",138.04,217.86],["2026-08-16",177.0,217.86],["2026-08-17",385.14,217.86],["2026-08-18",248.63,217.86],["2026-08-19",154.15,217.86],["2026-08-20",148.16,217.86],["2026-08-21",160.36,217.86],["2026-08-22",226.32,217.86],["2026-08-23",223.02,217.86],["2026-08-24",178.77,217.86],["2026-08-25",134.89,217.86],["2026-08-26",183.21,217.86],["2026-08-27",145.55,217.86],["2026-08-28",157.22,217.86],["2026-08-29",190.02,217.86],["2026-08-30",287.82,217.86],["2026-08-31",199.06,217.86],["2026-09-01",186.45,208.39],["2026-09-02",302.79,208.39],["2026-09-03",194.6,208.39],["2026-09-04",164.72,208.39],["2026-09-05",144.83,208.39],["2026-09-06",136.12,208.39],["2026-09-07",112.45,208.39],["2026-09-08",107.72,208.39],["2026-09-09",113.07,208.39],["2026-09-10",128.85,208.39],["2026-09-11",189.53,208.39],["2026-09-12",121.18,208.39],["2026-09-13",154.89,208.39],["2026-09-14",116.48,208.39],["2026-09-15",137.43,208.39],["2026-09-16",144.14,208.39],["2026-09-17",119.74,208.39],["2026-09-18",109.35,208.39],["2026-09-19",117.0,208.39],["2026-09-20",127.02,208.39],["2026-09-21",110.21,208.39],["2026-09-22",97.38,208.39],["2026-09-23",94.87,208.39],["2026-09-24",98.73,208.39],["2026-09-25",106.01,208.39],["2026-09-26",100.91,208.39],["2026-09-27",136.47,208.39],["2026-09-28",204.49,208.39],["2026-09-29",121.85,208.39],["2026-09-30",105.5,208.39],["2026-10-01",140.6,247.47],["2026-10-02",164.9,247.47],["2026-10-03",154.84,247.47],["2026-10-04",108.68,247.47],["2026-10-05",104.77,247.47],["2026-10-06",119.42,247.47],["2026-10-07",125.87,247.47],["2026-10-08",140.3,247.47]],"apn":[["2026-01-01",125.13,134.51],["2026-01-02",135.28,134.51],["2026-01-03",146.76,134.51],["2026-01-04",146.03,134.51],["2026-01-05",166.94,134.51],["2026-01-06",208.23,134.51],["2026-01-07",232.42,134.51],["2026-01-08",175.21,134.51],["2026-01-09",175.85,134.51],["2026-01-10",184.37,134.51],["2026-01-11",222.83,134.51],["2026-01-12",282.95,134.51],["2026-01-13",287.34,134.51],["2026-01-14",272.83,134.51],["2026-01-15",255.05,134.51],["2026-01-16",237.62,134.51],["2026-01-17",195.18,134.51],["2026-01-18",167.85,134.51],["2026-01-19",154.33,134.51],["2026-01-20",150.29,134.51],["2026-01-21",145.47,134.51],["2026-01-22",154.3,134.51],["2026-01-23",150.79,134.51],["2026-01-24",148.02,134.51],["2026-01-25",139.74,134.51],["2026-01-26",174.41,134.51],["2026-01-27",189.32,134.51],["2026-01-28",205.19,134.51],["2026-01-29",221.44,134.51],["2026-01-30",182.38,134.51],["2026-01-31",236.91,134.51],["2026-02-01",287.88,124.23],["2026-02-02",341.18,124.23],["2026-02-03",270.52,124.23],["2026-02-04",237.77,124.23],["2026-02-05",202.39,124.23],["2026-02-06",259.08,124.23],["2026-02-07",224.68,124.23],["2026-02-08",207.98,124.23],["2026-02-09",210.6,124.23],["2026-02-10",184.24,124.23],["2026-02-11",178.48,124.23],["2026-02-12",173.36,124.23],["2026-02-13",175.52,124.23],["2026-02-14",182.25,124.23],["2026-02-15",195.53,124.23],["2026-02-16",210.3,124.23],["2026-02-17",222.89,124.23],["2026-02-18",279.71,124.23],["2026-02-19",211.86,124.23],["2026-02-20",229.45,124.23],["2026-02-21",212.27,124.23],["2026-02-22",210.76,124.23],["2026-02-23",260.57,124.23],["2026-02-24",282.96,124.23],["2026-02-25",294.25,124.23],["2026-02-26",242.94,124.23],["2026-02-27",204.76,124.23],["2026-02-28",191.05,124.23],["2026-03-01",179.2,148.35],["2026-03-02",179.05,148.35],["2026-03-03",171.46,148.35],["2026-03-04",175.6,148.35],["2026-03-05",176.05,148.35],["2026-03-06",172.12,148.35],["2026-03-07",160.21,148.35],["2026-03-08",194.15,148.35],["2026-03-09",186.41,148.35],["2026-03-10",177.83,148.35],["2026-03-11",187.36,148.35],["2026-03-12",175.42,148.35],["2026-03-13",162.92,148.35],["2026-03-14",142.66,148.35],["2026-03-15",132.29,148.35],["2026-03-16",133.87,148.35],["2026-03-17",135.35,148.35],["2026-03-18",196.23,148.35],["2026-03-19",162.87,148.35],["2026-03-20",137.93,148.35],["2026-03-21",133.96,148.35],["2026-03-22",153.16,148.35],["2026-03-23",152.2,148.35],["2026-03-24",159.79,148.35],["2026-03-25",158.15,148.35],["2026-03-26",153.5,148.35],["2026-03-27",175.49,148.35],["2026-03-28",163.6,148.35],["2026-03-29",161.2,148.35],["2026-03-30",191.59,148.35],["2026-03-31",186.85,148.35],["2026-04-01",171.42,212.63],["2026-04-02",195.87,212.63],["2026-04-03",163.65,212.63],["2026-04-04",160.35,212.63],["2026-04-05",191.51,212.63],["2026-04-06",149.19,212.63],["2026-04-07",169.9,212.63],["2026-04-08",215.35,212.63],["2026-04-09",168.98,212.63],["2026-04-10",148.48,212.63],["2026-04-11",166.2,212.63],["2026-04-12",128.51,212.63],["2026-04-13",141.1,212.63],["2026-04-14",150.33,212.63],["2026-04-15",210.34,212.63],["2026-04-16",283.0,212.63],["2026-04-17",372.65,212.63],["2026-04-18",281.96,212.63],["2026-04-19",222.23,212.63],["2026-04-20",203.63,212.63],["2026-04-21",198.04,212.63],["2026-04-22",188.91,212.63],["2026-04-23",208.08,212.63],["2026-04-24",214.72,212.63],["2026-04-25",258.51,212.63],["2026-04-26",260.3,212.63],["2026-04-27",247.41,212.63],["2026-04-28",254.89,212.63],["2026-04-29",281.15,212.63],["2026-04-30",194.85,212.63],["2026-05-01",172.97,275.35],["2026-05-02",281.96,275.35],["2026-05-03",202.22,275.35],["2026-05-04",262.78,275.35],["2026-05-05",224.71,275.35],["2026-05-06",252.35,275.35],["2026-05-07",198.17,275.35],["2026-05-08",168.51,275.35],["2026-05-09",151.51,275.35],["2026-05-10",141.22,275.35],["2026-05-11",167.41,275.35],["2026-05-12",192.01,275.35],["2026-05-13",188.16,275.35],["2026-05-14",183.63,275.35],["2026-05-15",159.94,275.35],["2026-05-16",173.48,275.35],["2026-05-17",180.73,275.35],["2026-05-18",158.54,275.35],["2026-05-19",245.57,275.35],["2026-05-20",155.95,275.35],["2026-05-21",165.82,275.35],["2026-05-22",266.16,275.35],["2026-05-23",226.61,275.35],["2026-05-24",214.09,275.35],["2026-05-25",199.68,275.35],["2026-05-26",231.67,275.35],["2026-05-27",314.17,275.35],["2026-05-28",266.69,275.35],["2026-05-29",299.3,275.35],["2026-05-30",226.79,275.35],["2026-05-31",206.93,275.35],["2026-06-01",195.95,270.6],["2026-06-02",198.89,270.6],["2026-06-03",212.59,270.6],["2026-06-04",216.55,270.6],["2026-06-05",307.11,270.6],["2026-06-06",261.03,270.6],["2026-06-07",268.73,270.6],["2026-06-08",320.94,270.6],["2026-06-09",316.48,270.6],["2026-06-10",253.01,270.6],["2026-06-11",189.35,270.6],["2026-06-12",155.38,270.6],["2026-06-13",145.32,270.6],["2026-06-14",193.49,270.6],["2026-06-15",180.8,270.6],["2026-06-16",189.06,270.6],["2026-06-17",188.8,270.6],["2026-06-18",210.24,270.6],["2026-06-19",194.95,270.6],["2026-06-20",173.93,270.6],["2026-06-21",195.26,270.6],["2026-06-22",182.69,270.6],["2026-06-23",276.03,270.6],["2026-06-24",157.86,270.6],["2026-06-25",135.42,270.6],["2026-06-26",134.56,270.6],["2026-06-27",139.4,270.6],["2026-06-28",209.87,270.6],["2026-06-29",196.45,270.6],["2026-06-30",244.08,270.6],["2026-07-01",176.8,242.54],["2026-07-02",235.74,242.54],["2026-07-03",270.55,242.54],["2026-07-04",250.83,242.54],["2026-07-05",201.01,242.54],["2026-07-06",180.18,242.54],["2026-07-07",166.34,242.54],["2026-07-08",145.97,242.54],["2026-07-09",236.15,242.54],["2026-07-10",201.98,242.54],["2026-07-11",165.0,242.54],["2026-07-12",193.86,242.54],["2026-07-13",163.1,242.54],["2026-07-14",147.34,242.54],["2026-07-15",189.01,242.54],["2026-07-16",165.16,242.54],["2026-07-17",142.97,242.54],["2026-07-18",163.34,242.54],["2026-07-19",253.11,242.54],["2026-07-20",219.89,242.54],["2026-07-21",174.93,242.54],["2026-07-22",150.1,242.54],["2026-07-23",381.92,242.54],["2026-07-24",289.21,242.54],["2026-07-25",166.4,242.54],["2026-07-26",192.75,242.54],["2026-07-27",153.23,242.54],["2026-07-28",132.46,242.54],["2026-07-29",140.07,242.54],["2026-07-30",170.57,242.54],["2026-07-31",149.28,242.54],["2026-08-01",125.77,209.96],["2026-08-02",122.5,209.96],["2026-08-03",110.93,209.96],["2026-08-04",113.9,209.96],["2026-08-05",171.13,209.96],["2026-08-06",137.79,209.96],["2026-08-07",123.38,209.96],["2026-08-08",131.11,209.96],["2026-08-09",148.63,209.96],["2026-08-10",111.04,209.96],["2026-08-11",104.92,209.96],["2026-08-12",102.87,209.96],["2026-08-13",100.52,209.96],["2026-08-14",111.03,209.96],["2026-08-15",132.75,209.96],["2026-08-16",171.11,209.96],["2026-08-17",376.33,209.96],["2026-08-18",244.0,209.96],["2026-08-19",151.58,209.96],["2026-08-20",145.2,209.96],["2026-08-21",155.62,209.96],["2026-08-22",219.93,209.96],["2026-08-23",218.43,209.96],["2026-08-24",175.99,209.96],["2026-08-25",132.71,209.96],["2026-08-26",179.9,209.96],["2026-08-27",143.04,209.96],["2026-08-28",153.74,209.96],["2026-08-29",185.91,209.96],["2026-08-30",278.39,209.96],["2026-08-31",193.89,209.96],["2026-09-01",182.16,201.45],["2026-09-02",295.35,201.45],["2026-09-03",189.56,201.45],["2026-09-04",159.55,201.45],["2026-09-05",141.02,201.45],["2026-09-06",132.53,201.45],["2026-09-07",109.39,201.45],["2026-09-08",104.71,201.45],["2026-09-09",109.81,201.45],["2026-09-10",125.49,201.45],["2026-09-11",185.34,201.45],["2026-09-12",118.07,201.45],["2026-09-13",149.51,201.45],["2026-09-14",113.15,201.45],["2026-09-15",133.79,201.45],["2026-09-16",140.54,201.45],["2026-09-17",116.67,201.45],["2026-09-18",106.17,201.45],["2026-09-19",113.49,201.45],["2026-09-20",121.86,201.45],["2026-09-21",107.02,201.45],["2026-09-22",94.25,201.45],["2026-09-23",91.81,201.45],["2026-09-24",95.74,201.45],["2026-09-25",103.14,201.45],["2026-09-26",97.81,201.45],["2026-09-27",132.6,201.45],["2026-09-28",199.37,201.45],["2026-09-29",118.92,201.45],["2026-09-30",102.78,201.45],["2026-10-01",137.66,238.46],["2026-10-02",160.96,238.46],["2026-10-03",151.83,238.46],["2026-10-04",106.19,238.46],["2026-10-05",102.46,238.46],["2026-10-06",117.06,238.46],["2026-10-07",122.93,238.46],["2026-10-08",137.39,238.46]],"h95":{"ANTIOQUIA":[41.93,37.16,37.43,55.87,76.33,69.39,55.12,null,null,77.63],"CALDAS":[4.67,4.5,5.31,6.58,6.84,5.34,3.79,null,null,6.21],"CARIBE":[0.87,0.6,0.58,1.15,2.89,3.72,3.74,null,null,3.66],"CENTRO":[8.21,8.0,10.61,20.96,29.31,30.01,31.92,null,null,24.83],"ORIENTE":[3.42,2.8,4.85,14.04,26.78,38.82,43.42,null,null,16.69],"VALLE":[6.84,5.66,6.11,8.7,9.84,8.43,6.14,null,null,7.07],"SIN":[65.94,58.72,64.89,107.3,151.99,155.71,144.13,null,null,136.09]},"vert":{"meses":[1,2,3,4,5,6,7,8,9,10],"series":{"ITUANGO":[514.0,980.1,717.9,287.8,66.9,60.0,11.8,0.0,0.2,0.0],"GUAVIO":[0.0,0.0,0.0,0.0,0.0,0.0,210.7,177.7,61.9,0.0],"ESMERALDA":[0.0,0.0,0.0,0.0,0.0,0.0,115.7,156.7,16.9,0.0],"OTROS":[18.0,315.3,7.8,14.6,0.8,0.4,0.0,9.8,16.8,0.0]},"total":3761.9},"meta":{"fecha":"2026-10-08","E":13212.5,"cap":17658.1,"parcial":true,"dia":8,"generado":"09/10/2026 11:25","vert_hasta":"2026-10-08"}};
+const MES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const nf=(v,d=2)=>v==null?'—':v.toLocaleString('es-CO',{minimumFractionDigits:d,maximumFractionDigits:d});
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const charts=[];
+function fdate(s){const d=new Date(s+'T00:00:00');return d.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][d.getMonth()];}
+function base(){
+  const ink2=css('--ink-2'),grid=css('--grid');
+  Chart.defaults.font.family=css('--f-mono')||'monospace';Chart.defaults.font.size=11.5;Chart.defaults.color=ink2;
+  return {responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:css('--ink'),titleColor:css('--bg'),bodyColor:css('--bg'),padding:9,cornerRadius:6,boxPadding:4,usePointStyle:true}},
+    scales:{x:{grid:{display:false},border:{color:css('--rule')},ticks:{maxRotation:0,autoSkipPadding:18}},y:{grid:{color:grid},border:{display:false}}}};
+}
+function draw(){
+  charts.forEach(c=>c.destroy());charts.length=0;
+  const W=css('--water'),S=css('--senda'),C=css('--car'),R=css('--risk'),P=css('--pos'),N=css('--neg'),B=css('--band');
+  const lab=D.daily.map(r=>r[0]);
+  // 1 reserva vs senda vs CAR
+  let o=base();
+  o.scales.x.ticks.callback=function(v,i){const s=lab[i];return s.endsWith('-01')?fdate(s).split(' ')[1]:null};o.scales.x.ticks.autoSkip=false;
+  o.scales.y.min=20;o.scales.y.max=100;o.scales.y.ticks={callback:v=>v+' %',stepSize:20};
+  o.plugins.tooltip.callbacks={title:i=>fdate(lab[i[0].dataIndex]),label:c=>c.dataset.label?`${c.dataset.label}: ${nf(c.raw)} %`:null};
+  o.plugins.tooltip.filter=c=>!!c.dataset.label&&c.raw!=null;
+  charts.push(new Chart(document.getElementById('c1'),{type:'line',data:{labels:lab,datasets:[
+    {label:'Reserva real',data:D.daily.map(r=>r[1]),borderColor:W,borderWidth:2.25,pointRadius:0,pointHoverRadius:5,pointHoverBorderColor:css('--surface'),pointHoverBorderWidth:2,pointHoverBackgroundColor:W,spanGaps:false},
+    {label:'Senda CREG',data:D.daily.map(r=>r[2]),borderColor:S,borderWidth:2,borderDash:[6,4],pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:S},
+    {label:'CAR',data:D.daily.map(r=>r[3]),borderColor:C,borderWidth:1.5,stepped:true,pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:C,fill:{target:{value:20}},backgroundColor:R},
+    {label:'Reserva + vertimientos acumulados',data:D.daily.map(r=>r[5]!=null?r[5]:null),borderColor:css('--c3'),borderWidth:2,borderDash:[2,4],pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:css('--c3'),spanGaps:false}
+  ]},options:o}));
+  // 2 brecha
+  const gap=D.daily.map(r=>r[1]!=null&&r[2]!=null?+(r[1]-r[2]).toFixed(2):null);
+  o=base();o.scales.x.ticks.callback=function(v,i){const s=lab[i];return s.endsWith('-01')?fdate(s).split(' ')[1]:null};o.scales.x.ticks.autoSkip=false;
+  o.scales.y.ticks={callback:v=>(v>0?'+':'')+v+' pp'};
+  o.plugins.tooltip.callbacks={title:i=>fdate(lab[i[0].dataIndex]),label:c=>`Brecha: ${c.raw>0?'+':''}${nf(c.raw)} pp`};
+  o.plugins.tooltip.filter=c=>c.raw!=null;
+  charts.push(new Chart(document.getElementById('c2'),{type:'bar',data:{labels:lab,datasets:[{data:gap,backgroundColor:gap.map(v=>v>=0?P:N),barPercentage:1,categoryPercentage:.85,borderRadius:0}]},options:o}));
+  // 3 aportes SIN mensual
+  const sin=D.heat.SIN;o=base();o.interaction={mode:'nearest',intersect:false,axis:'x'};
+  o.scales.y.min=0;o.scales.y.max=200;o.scales.y.ticks={callback:v=>v+' %',stepSize:50};
+  o.plugins.tooltip.callbacks={label:c=>c.datasetIndex?null:[`${nf(c.raw)} % de la media`,`${nf(sin[c.dataIndex][1],1)} de ${nf(sin[c.dataIndex][2],1)} GWh/día`]};
+  o.plugins.tooltip.filter=c=>c.datasetIndex===0;
+  charts.push(new Chart(document.getElementById('c3'),{type:'bar',data:{labels:MES.slice(0,sin.length).map((m,i)=>i==sin.length-1&&D.meta.parcial?m+'*':m),datasets:[
+    {type:'bar',data:sin.map(r=>r[0]),backgroundColor:sin.map(r=>r[0]>=100?P:N),borderRadius:{topLeft:4,topRight:4},borderSkipped:'start',barPercentage:.7,order:2},
+    {type:'line',data:sin.map(()=>100),borderColor:css('--ink-3'),borderWidth:1,borderDash:[3,3],pointRadius:0,order:1}
+  ]},options:o}));
+  // 4 semanal vs escenario
+  const wl=D.weekly.map(r=>r[0]);o=base();
+  o.scales.x.ticks.callback=function(v,i){return fdate(wl[i])};o.scales.y.min=0;o.scales.y.ticks={callback:v=>v};
+  o.scales.y.title={display:true,text:'GWh/día',color:css('--ink-3')};
+  o.plugins.tooltip.callbacks={title:i=>'Semana del '+fdate(wl[i[0].dataIndex]),label:c=>`${c.dataset.label}: ${nf(c.raw,1)}`};
+  o.plugins.tooltip.filter=c=>!!c.dataset.label;
+  charts.push(new Chart(document.getElementById('c4'),{type:'line',data:{labels:wl,datasets:[
+    {label:'Máx. escenario',data:D.weekly.map(r=>r[4]),borderWidth:0,pointRadius:0,fill:'+1',backgroundColor:B},
+    {label:'Mín. escenario',data:D.weekly.map(r=>r[2]),borderWidth:0,pointRadius:0},
+    {label:'Prom. escenario',data:D.weekly.map(r=>r[3]),borderColor:S,borderWidth:2,borderDash:[6,4],pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:S},
+    {label:'Aporte real',data:D.weekly.map(r=>r[1]),borderColor:W,borderWidth:2.25,pointRadius:2.5,pointBackgroundColor:W,pointHoverRadius:5}
+  ]},options:o}));
+}
+// heatmap: diverging rojo<-gris->azul, centrado en 100, recorte 40-160
+function mix(a,b,t){const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const x=p(a),y=p(b);return'#'+x.map((v,i)=>Math.round(v+(y[i]-v)*t).toString(16).padStart(2,'0')).join('')}
+function heat(){
+  const P=css('--pos'),N=css('--neg'),M=css('--mid');
+  const col=v=>{const c=Math.max(40,Math.min(160,v));return c<100?mix(M,N,(100-c)/60*0.85):mix(M,P,(c-100)/60*0.85)};
+  const dark=matchMedia('(prefers-color-scheme: dark)').matches&&document.documentElement.dataset.theme!=='light'||document.documentElement.dataset.theme==='dark';
+  const ink=v=>{const t=Math.abs(Math.max(40,Math.min(160,v))-100)/60;return t>.6&&!dark?'#ffffff':'var(--ink)'};
+  const names={ANTIOQUIA:'Antioquia',CALDAS:'Caldas',CARIBE:'Caribe',CENTRO:'Centro',ORIENTE:'Oriente',VALLE:'Valle',SIN:'SIN'};
+  const star={};
+  let h='<thead><tr><th class="r">Región</th>'+MES.slice(0,D.heat.SIN.length).map((m,i)=>`<th>${i==D.heat.SIN.length-1&&D.meta.parcial?m+' 1–'+D.meta.dia:m}</th>`).join('')+'</tr></thead><tbody>';
+  for(const r in D.heat){h+=`<tr class="${r=='SIN'?'sin':''}"><th class="r">${names[r]}</th>`+D.heat[r].map((c,i)=>`<td style="background:${col(c[0])};color:${ink(c[0])}" data-t="${names[r]} · ${MES[i]}|${nf(c[0])} % de la media|${nf(c[1])} de ${nf(c[2])} GWh/día${D.h95&&D.h95[r]&&D.h95[r][i]?' · Hidrología 95 %: '+nf(D.h95[r][i],1):''}">${nf(c[0],0)}${(star[r]||[]).includes(i)?'*':''}</td>`).join('')+'</tr>'}
+  document.getElementById('heat').innerHTML=h+'</tbody>';
+  document.getElementById('scalebar').style.background=`linear-gradient(90deg,${col(40)},${col(100)},${col(160)})`;
+}
+function cuts(){
+  const s={};D.daily.forEach(r=>s[r[0]]=r[2]);
+  document.querySelector('#cuts tbody').innerHTML=D.cuts.map(r=>{const sd=s[r[0]];const g=sd!=null?r[3]-sd:null;
+    const cl=v=>v==null?'':v>=0?'up':'dn';const sg=v=>v==null?'—':(v>0?'+':'')+nf(v);
+    return `<tr><td>${fdate(r[0])}</td><td>${nf(r[1],1)}</td><td>${nf(r[2],1)}</td><td>${nf(r[3])} %</td><td class="${cl(r[4])}">${sg(r[4])}</td><td class="${cl(r[5])}">${r[5]==null?'—':(r[5]>0?'+':'')+nf(r[5],1)}</td><td>${sd!=null?nf(sd)+' %':'—'}</td><td class="${cl(g)}">${sg(g)}</td><td>${r[6]==null?'—':nf(r[6],0)}</td></tr>`}).join('');
+  const vh=D.meta.vert_hasta;document.getElementById('vhasta').textContent=vh?' (datos hasta el '+fdate(vh)+')':'';
+}
+const tip=document.getElementById('tip');
+document.addEventListener('mousemove',e=>{const t=e.target.closest('td[data-t]');if(!t){tip.style.display='none';return}
+  const [a,b,c]=t.dataset.t.split('|');tip.innerHTML=`<b>${a}</b><br>${b}<br>${c.replace(' · ','<br>')}`;tip.style.display='block';
+  const x=Math.min(e.clientX+14,innerWidth-250);tip.style.left=x+'px';tip.style.top=(e.clientY+14)+'px'});
+
+function kpis(){
+  const M=D.meta, last=D.daily.filter(r=>r[1]!=null).pop(), f=last[0];
+  const gap=last[2]!=null?last[1]-last[2]:null, mcar=last[3]!=null?last[1]-last[3]:null;
+  const sin=D.heat.SIN[D.heat.SIN.length-1];
+  const desde=D.daily.filter(r=>r[0]>='2026-05-01'&&r[1]!=null&&r[2]!=null), abajo=desde.filter(r=>r[1]<r[2]).length;
+  const fin=D.daily.filter(r=>r[2]!=null).pop(); const dias=Math.round((new Date(fin[0])-new Date(f))/864e5);
+  const need=(fin[2]-last[1])/100*M.cap;
+  const chip=(c,t,col)=>`<span class="chip ${c}"><i style="background:${col}"></i>${t}</span>`;
+  const sg=v=>(v>0?'+':'')+nf(v);
+  document.getElementById('kpis').innerHTML=
+   `<div class="kpi"><span class="l">Reserva útil SIN · ${fdate(f)}</span><span class="v">${nf(last[1])} %</span><span class="s">${nf(M.E,0)} GWh de ${nf(M.cap,0)}</span>${gap<0?chip('warn','Bajo la senda','#eda100'):chip('ok','Sobre la senda','#1baf7a')}</div>`+
+   `<div class="kpi"><span class="l">Brecha frente a la senda CREG</span><span class="v">${gap==null?'—':sg(gap)+' pp'}</span><span class="s">senda ${nf(last[2])} %</span>${chip(abajo>desde.length/2?'warn':'ok',abajo+' de '+desde.length+' días abajo','#eda100')}</div>`+
+   `<div class="kpi"><span class="l">Margen sobre la CAR</span><span class="v">${mcar==null?'—':sg(mcar)+' pp'}</span><span class="s">CAR ${nf(last[3])} %</span>${mcar>10?chip('ok','Sin riesgo inmediato','#1baf7a'):chip('bad','Cerca de la CAR','var(--neg)')}</div>`+
+   `<div class="kpi"><span class="l">Aportes SIN · ${MES[D.heat.SIN.length-1]}${M.parcial?' 1–'+M.dia:''}</span><span class="v">${nf(sin[0])} %</span><span class="s">${nf(sin[1],1)} de ${nf(sin[2],1)} GWh/día</span>${sin[0]<90?chip('bad','Déficit hídrico','var(--neg)'):sin[0]>110?chip('ok','Sobre lo normal','#1baf7a'):chip('ok','Cerca de lo normal','#1baf7a')}</div>`;
+  document.getElementById('eyebrow').textContent='Sistema Interconectado Nacional · datos XM al '+fdate(f)+' '+f.slice(0,4);
+  document.getElementById('txt1').textContent= dias>0
+    ? `Al ${fdate(f)} la reserva está ${gap<0?nf(-gap)+' pp por debajo':nf(gap)+' pp por encima'} de la senda. Para llegar a ${nf(fin[2])} % el ${fdate(fin[0])}, el SIN ${need>0?'necesita acumular unos '+nf(need,0)+' GWh netos en '+dias+' días':'ya supera esa meta'}.`
+    : `Al ${fdate(f)} la reserva está ${gap<0?nf(-gap)+' pp por debajo':nf(gap)+' pp por encima'} de la senda.`;
+  const ant=D.heat.ANTIOQUIA[D.heat.ANTIOQUIA.length-1][0];
+  document.getElementById('txt2').textContent=`En lo que va de ${MES[D.heat.SIN.length-1]}, los aportes del SIN llegan al ${nf(sin[0])} % de la media histórica. Antioquia, la región de mayor peso, está en ${nf(ant)} %.`;
+  document.getElementById('corte').textContent=`Datos con corte al ${fdate(f)} de ${f.slice(0,4)}, actualizados el ${M.generado}. XM revisa las cifras al día siguiente de cada corte.`;
+}
+
+function semaforo(){
+  const ST={v:['#1baf7a','Normal'],a:['#eda100','Vigilar'],r:['#e34948','Crítico']};
+  const last=D.daily.filter(r=>r[1]!=null).pop(), f=last[0];
+  const i30=D.daily.findIndex(r=>r[0]===f)-30, prev=i30>=0?D.daily[i30]:null;
+  const sin=D.heat.SIN[D.heat.SIN.length-1][0];
+  const gap=last[2]!=null?last[1]-last[2]:null, car=last[3]!=null?last[1]-last[3]:null, tr=prev&&prev[1]!=null?last[1]-prev[1]:null;
+  const A=(D.apn&&D.apn.length)?D.apn:D.apd, w=A.slice(-28), hsin=w.length===28?w.reduce((a,r)=>a+r[1],0)/w.reduce((a,r)=>a+r[2],0)*100:null;
+  const k=D.heat.SIN.length-1, sinv=D.heat.SIN[k], h95v=D.h95&&D.h95.SIN?D.h95.SIN[k]:null, r95=h95v?sinv[1]/h95v*100:null;
+  const lv=(x,g,y)=>x==null?null:(x>=g?'v':x>=y?'a':'r');
+  const it=[
+    ['Aportes SIN del mes',nf(sin)+' %','% de la media histórica',lv(sin,90,70)],
+    ['Brecha con la senda',gap==null?'—':(gap>0?'+':'')+nf(gap)+' pp','reserva real − senda CREG',lv(gap,0,-5)],
+    ['Margen sobre la CAR',car==null?'—':(car>0?'+':'')+nf(car)+' pp','reserva real − CAR',car==null?null:(car>20?'v':car>=10?'a':'r')],
+    ['Tendencia de la reserva',tr==null?'—':(tr>0?'+':'')+nf(tr)+' pp','últimos 30 días',lv(tr,0,-3)],
+    ['HSIN · CREG 209/2020',hsin==null?'—':nf(hsin)+' %',hsin==null?'':(hsin>=90?'condición normal':'condición de vigilancia'),hsin==null?null:(hsin>=90?'v':'a')],
+    ['Aportes vs. Hidrología 95 %',r95==null?'—':nf(r95,0)+' %',r95==null?'sin dato de Hidrología 95 % para este mes':nf(sinv[1],1)+' de '+nf(h95v,1)+' GWh/día (año muy seco)'+(D.meta.parcial&&D.meta.dia<10?' · solo '+D.meta.dia+' días: señal, no tendencia':''),r95==null?null:lv(r95,110,100)]];
+  const rojos=it.filter(x=>x[3]==='r').length, amar=it.filter(x=>x[3]==='a').length;
+  let g,txt;
+  if(it[2][3]==='r'){g=['#e34948','Alerta roja'];txt='La reserva está a menos de 10 pp de la CAR.'}
+  else if(rojos>=2){g=['#eb6834','Alerta naranja'];txt='Dos o más indicadores en rojo, pero con margen sobre la CAR.'}
+  else if(rojos===1||amar>=2){g=['#eda100','Alerta amarilla'];txt='Hay señales de deterioro que conviene vigilar.'}
+  else {g=['#1baf7a','Sin alerta'];txt='Los indicadores están dentro de lo esperado.'}
+  document.getElementById('semaforo').innerHTML=
+    `<div class="sem-g" style="--st:${g[0]}"><span class="n" style="font-size:12.5px;color:var(--ink-2)">Estado general · ${fdate(f)}</span><span class="big">${g[1]}</span><span class="st"><i></i>${rojos} en rojo · ${amar} en amarillo</span><span style="font-size:13px;color:var(--ink-2)">${txt}</span></div>`+
+    it.map(x=>{const s=ST[x[3]]||['var(--ink-3)','Sin dato'];return `<div class="sem-i" style="--st:${s[0]}"><span class="n">${x[0]}</span><span class="v">${x[1]}</span><span class="u">${x[2]}</span><span class="st"><i></i>${s[1]}</span></div>`}).join('');
+}
+
+function draw2(){
+  const W=css('--water'),S=css('--senda'),R=css('--risk'),B=css('--band'),P=css('--pos'),N=css('--neg');
+  const ap=D.apd, lab=ap.map(r=>r[0]);
+  const ma=ap.map((r,i)=>{if(i<6)return null;let a=0,h=0;for(let k=i-6;k<=i;k++){a+=ap[k][1];h+=ap[k][2]}return [+(a/7).toFixed(1),+(h/7).toFixed(1)]});
+  const res={};D.daily.forEach(r=>res[r[0]]=r[1]);
+  const tick=function(v,i){const x=lab[i];return x&&x.endsWith('-01')?fdate(x).split(' ')[1]:null};
+  let o1=base();o1.scales.x.ticks.callback=tick;o1.scales.x.ticks.autoSkip=false;o1.scales.y.ticks={callback:v=>v+' %'};
+  o1.plugins.tooltip.callbacks={title:i=>fdate(lab[i[0].dataIndex]),label:c=>`Reserva: ${nf(c.raw)} %`};o1.plugins.tooltip.filter=c=>c.raw!=null;
+  let o2=base();o2.scales.x.ticks.callback=tick;o2.scales.x.ticks.autoSkip=false;o2.scales.y.min=0;o2.scales.y.title={display:true,text:'GWh/día',color:css('--ink-3')};
+  o2.plugins.tooltip.callbacks={title:i=>fdate(lab[i[0].dataIndex]),label:c=>{if(c.datasetIndex>1)return null;const m=ma[c.dataIndex];if(!m)return null;return c.datasetIndex===0?`Aportes (7 días): ${nf(m[0],1)} GWh/día · ${nf(m[0]/m[1]*100,0)} % de la media`:`Media histórica: ${nf(m[1],1)} GWh/día`}};
+  o2.plugins.tooltip.filter=c=>c.datasetIndex<2&&c.raw!=null;
+  const c5=new Chart(document.getElementById('c5'),{type:'line',data:{labels:lab,datasets:[{data:lab.map(d=>res[d]??null),borderColor:W,borderWidth:2.25,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:W}]},options:o1});
+  const real=ma.map(m=>m?m[0]:null), hist=ma.map(m=>m?m[1]:null);
+  const c6=new Chart(document.getElementById('c6'),{type:'line',data:{labels:lab,datasets:[
+    {data:real,borderColor:W,borderWidth:2.25,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:W,fill:{target:1,above:B,below:R}},
+    {data:hist,borderColor:S,borderWidth:1.75,borderDash:[6,4],pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:S}]},options:o2});
+  const sync=(a,b)=>{a.options.onHover=(e,els)=>{const i=els.length?els[0].index:null;if(i==null){b.setActiveElements([]);b.tooltip.setActiveElements([],{x:0,y:0})}else{const act=b.data.datasets.map((d,k)=>({datasetIndex:k,index:i})).filter(x=>b.data.datasets[x.datasetIndex].data[i]!=null);b.setActiveElements(act);b.tooltip.setActiveElements(act,{x:0,y:0})}b.update('none')};a.update('none')};
+  sync(c5,c6);sync(c6,c5);
+  [c5,c6].forEach(c=>c.canvas.addEventListener('mouseleave',()=>[c5,c6].forEach(k=>{k.setActiveElements([]);k.tooltip.setActiveElements([],{x:0,y:0});k.update('none')})));
+  charts.push(c5,c6);
+  // mensual: Δ GWh de la reserva + aportes %
+  const cuts=D.cuts.filter(r=>r[5]!=null), mi=r=>new Date(r[0]+'T00:00:00').getMonth();
+  const labs=cuts.map(r=>{const m=mi(r),h=D.heat.SIN[m];return [MES[m]+(r[0].endsWith(String(new Date(new Date(r[0]).getFullYear(),m+1,0).getDate()).padStart(2,'0'))?'':' 1–'+(+r[0].slice(8))), h?nf(h[0],0)+' %':''];});
+  let o3=base();o3.interaction={mode:'nearest',intersect:false,axis:'x'};o3.scales.y.ticks={callback:v=>(v>0?'+':'')+nf(v,0)};o3.scales.y.title={display:true,text:'Δ reserva (GWh)',color:css('--ink-3')};
+  o3.plugins.tooltip.callbacks={title:i=>labs[i[0].dataIndex][0],label:c=>{const r=cuts[c.dataIndex],h=D.heat.SIN[mi(r)];return [`Reserva: ${c.raw>0?'+':''}${nf(c.raw,0)} GWh (${r[4]>0?'+':''}${nf(r[4])} pp)`,h?`Aportes: ${nf(h[0])} % de la media`:'']}};
+  charts.push(new Chart(document.getElementById('c7'),{type:'bar',data:{labels:labs,datasets:[{data:cuts.map(r=>r[5]),backgroundColor:cuts.map(r=>r[5]>=0?P:N),borderRadius:4,borderSkipped:'start',barPercentage:.65}]},options:o3}));
+  // texto
+  const last=ma.filter(Boolean).pop(), lr=D.daily.filter(r=>r[1]!=null).pop();
+  const peak=D.daily.filter(r=>r[1]!=null).reduce((a,b)=>b[1]>a[1]?b:a);
+  document.getElementById('txt3').textContent=`La reserva tocó su máximo del año el ${fdate(peak[0])} (${nf(peak[1])} %) y desde entonces baja. En los últimos 7 días los aportes promedian ${nf(last[0],1)} GWh/día, el ${nf(last[0]/last[1]*100,0)} % de la media histórica (${nf(last[1],1)} GWh/día).`;
+}
+
+function draw3(){
+  const V=D.vert; if(!V){document.getElementById('txt4').textContent='No hay datos de vertimientos para este corte.';return}
+  const cols=[css('--water'),css('--senda'),css('--c3'),css('--ink-3')], names=Object.keys(V.series);
+  const nm=k=>k==='OTROS'?'Otros embalses':k.charAt(0)+k.slice(1).toLowerCase();
+  document.getElementById('vleg').innerHTML=names.map((k,i)=>`<span><i class="sw box" style="background:${cols[i]}"></i>${nm(k)}</span>`).join('');
+  let o=base();o.scales.x.stacked=true;o.scales.y.stacked=true;o.scales.y.title={display:true,text:'GWh',color:css('--ink-3')};
+  o.plugins.tooltip.callbacks={title:i=>MES[V.meses[i[0].dataIndex]-1],label:c=>`${c.dataset.label}: ${nf(c.raw,1)} GWh`,footer:i=>'Total: '+nf(i.reduce((a,c)=>a+c.raw,0),1)+' GWh'};
+  o.plugins.tooltip.filter=c=>c.raw>0;
+  charts.push(new Chart(document.getElementById('c8'),{type:'bar',data:{labels:V.meses.map(m=>MES[m-1]),datasets:names.map((k,i)=>({label:nm(k),data:V.series[k],backgroundColor:cols[i],borderColor:css('--surface'),borderWidth:{top:2},borderSkipped:false,borderRadius:i===names.length-1?{topLeft:4,topRight:4}:0,barPercentage:.65}))},options:o}));
+  const pp=V.total/D.meta.cap*100, k0=names[0], s0=V.series[k0].reduce((a,b)=>a+b,0);
+  document.getElementById('txt4').textContent=`En 2026 se han vertido ${nf(V.total,0)} GWh, el equivalente a ${nf(pp,1)} pp de la capacidad útil del SIN. ${nm(k0)} explica ${nf(s0,0)} GWh (${nf(s0/V.total*100,0)} %): su embalse es pequeño frente al caudal del río, así que lo que no alcanza a turbinar se pierde.`;
+  const i7=V.meses.indexOf(7);
+  if(i7>=0){const s7=names.reduce((a,k)=>a+V.series[k].slice(i7).reduce((x,y)=>x+y,0),0), p7=s7/D.meta.cap*100;
+    const last=D.daily.filter(r=>r[1]!=null).pop(), gap=last[2]!=null?last[1]-last[2]:null;
+    if(s7>0) document.getElementById('txt4').textContent+=` Desde el 1 de julio se han vertido ${nf(s7,0)} GWh (${nf(p7,1)} pp)`+(gap!=null&&gap<0?`, más que la brecha actual con la senda (${nf(-gap,1)} pp).`:'.');}
+}
+
+function draw4(){
+  const A=D.apd, AN=(D.apn&&D.apn.length)?D.apn:D.apd, lab=[], hs=[], acc=[];
+  let mo=null, so=0, sh=0;
+  A.forEach((r,i)=>{
+    const m=r[0].slice(0,7); if(m!==mo){mo=m;so=0;sh=0} so+=r[1]; sh+=r[2];
+    lab.push(r[0]); acc.push(+(so/sh*100).toFixed(2));
+    hs.push(null);
+  });
+  const ni={};AN.forEach((r,i)=>ni[r[0]]=i);
+  lab.forEach((d,j)=>{const i=ni[d];if(i!=null&&i>=27){let o=0,h=0;for(let k=i-27;k<=i;k++){o+=AN[k][1];h+=AN[k][2]}hs[j]=+(o/h*100).toFixed(2)}});
+  const W=css('--water'),S=css('--senda'),R=css('--risk'),I3=css('--ink-3');
+  let o=base();o.scales.x.ticks.callback=function(v,i){const x=lab[i];return x&&x.endsWith('-01')?fdate(x).split(' ')[1]:null};o.scales.x.ticks.autoSkip=false;
+  const mx=Math.max(...hs.filter(v=>v!=null),...acc);o.scales.y.min=0;o.scales.y.max=Math.ceil(Math.min(mx,250)/50)*50;o.scales.y.ticks={callback:v=>v+' %',stepSize:50};
+  o.plugins.tooltip.callbacks={title:i=>fdate(lab[i[0].dataIndex]),label:c=>c.dataset.label?`${c.dataset.label}: ${nf(c.raw)} %`:null};
+  o.plugins.tooltip.filter=c=>!!c.dataset.label&&c.raw!=null;
+  charts.push(new Chart(document.getElementById('c9'),{type:'line',data:{labels:lab,datasets:[
+    {label:'HSIN (4 semanas)',data:hs,borderColor:W,borderWidth:2.5,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:W},
+    {label:'Acumulado del mes',data:acc,borderColor:S,borderWidth:1.5,borderDash:[5,4],pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:S},
+    {data:lab.map(()=>90),borderColor:I3,borderWidth:1,pointRadius:0,fill:{target:{value:0}},backgroundColor:R},
+    {data:lab.map(()=>100),borderColor:I3,borderWidth:1,borderDash:[2,3],pointRadius:0}
+  ]},options:o}));
+  // texto
+  const v=hs.map((x,i)=>[lab[i],x]).filter(x=>x[1]!=null), last=v[v.length-1];
+  let k=v.length-1; while(k>0&&v[k-1][1]<90)k--;
+  const maxv=v.reduce((a,b)=>b[1]>a[1]?b:a), minv=v.reduce((a,b)=>b[1]<a[1]?b:a);
+  document.getElementById('txt5').textContent=`El HSIN llegó a ${nf(maxv[1],0)} % el ${fdate(maxv[0])}, con el exceso de aportes de febrero. `+
+    (last[1]<90?`Está por debajo del 90 % (condición de vigilancia) sin interrupción desde el ${fdate(v[k][0])}. `:'Hoy está en condición normal. ')+
+    `Hoy marca ${nf(last[1])} %, y su punto más bajo del año fue ${nf(minv[1])} % el ${fdate(minv[0])}.`;
+}
+function all(){try{draw();draw2();draw3();draw4()}catch(e){console.error(e)}heat();cuts()}
+function boot(){ kpis(); semaforo(); if(window.Chart){all()} else {heat();cuts()} }
+if(document.fonts&&document.fonts.ready){document.fonts.ready.then(boot)}else boot();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',all);
+new MutationObserver(all).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 </script>
-</body>
-</html>
+
+
+<script>
+fetch('reportes/ULTIMO.html',{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.text()}).then(h=>{document.getElementById('brief').innerHTML=h}).catch(()=>{document.getElementById('brief-dia').hidden=true});
+</script>
+</body></html>

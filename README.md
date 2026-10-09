@@ -11,7 +11,7 @@ Todos los días a las 7:40 a.m. (hora de Colombia), GitHub Actions ejecuta el fl
 1. Consulta la API pública de XM (`servapibi.xm.com.co`).
 2. Calcula los indicadores (`src/xm_brief.py`) y guarda el resultado en `reportes/json/AAAA-MM-DD.json`.
 3. Genera el brief con alertas (`src/brief_md.py`) en `reportes/AAAA-MM-DD.md` y `reportes/ULTIMO.md`.
-4. Actualiza los datos del tablero `dashboard/index.html` (`src/update_dashboard.py`).
+4. Actualiza los datos del tablero `index.html` (página principal, publicada en https://arcomisp.github.io/Monitoreo-HSIN-XM/) (`src/update_dashboard.py`).
 5. Guarda los cambios con un commit "Datos XM al AAAA-MM-DD".
 
 También se puede ejecutar a mano: pestaña **Actions → Análisis diario XM → Run workflow**.
@@ -43,7 +43,7 @@ Solo requiere Python 3.10 o superior, sin librerías adicionales.
 python3 src/xm_brief.py > xm.json             # último día disponible
 python3 src/xm_brief.py 2026-08-18 > xm.json  # fecha de corte específica
 python3 src/brief_md.py xm.json
-python3 src/update_dashboard.py dashboard/index.html dashboard/index.html
+python3 src/update_dashboard.py index.html index.html
 ```
 
 ## Fuente
