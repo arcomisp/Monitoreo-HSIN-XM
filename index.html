@@ -130,6 +130,10 @@ table.data th:first-child,table.data td:first-child{text-align:left;font-family:
 .dx-final p{color:var(--ink)}
 .dx-nota{font-size:12px!important;color:var(--ink-3)!important}
 .tag-caribe{display:inline-block;margin-left:6px;font-size:11px;font-weight:600;padding:1px 7px;border-radius:99px;background:color-mix(in srgb,var(--senda) 18%,transparent);color:var(--ink);font-family:var(--f-body)}
+.sismo{border-left:4px solid var(--senda);display:flex;flex-direction:column;gap:10px}
+.sismo h3{margin:0;font-family:var(--f-display);font-stretch:90%;font-size:17px}
+.sismo>p{margin:0;color:var(--ink-2);max-width:80ch}
+.sismo-l{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink-2)}
 footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padding-top:14px;display:flex;flex-direction:column;gap:4px}
 #tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:6px 9px;border-radius:6px;font-family:var(--f-mono);display:none;z-index:9;max-width:240px}
 @media (max-width:760px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:minmax(0,1fr)}.cv{height:300px}.kpi .v{font-size:27px}}
@@ -193,6 +197,35 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
       <table class="data" id="dnasub" style="min-width:0" aria-label="Subáreas con mayor demanda no atendida en el año"><thead><tr><th>Subárea</th><th>GWh</th><th>Días con DNA</th></tr></thead><tbody></tbody></table>
       <p class="note">Subáreas con mayor DNA en el año. <b>Caribe</b> marca las subáreas de la costa Caribe.</p>
     </div>
+  </div>
+  <div class="card sismo">
+    <h3>Evento destacado: el sismo de agosto de 2026 en el Valle y el Eje Cafetero</h3>
+    <p>A partir del <b>10 de agosto</b>, el sismo dañó las <b>redes de distribución local (SDL)</b> del Valle del Cauca y de Caldas, Quindío y Risaralda. No afectó la generación ni la red de transmisión nacional: la energía estaba disponible, pero no podía llegar a los usuarios por los daños en las redes de los operadores.</p>
+    <div class="grid2">
+      <div class="tw"><table class="data" style="min-width:0" aria-label="Demanda no atendida diaria por el sismo, en MWh">
+        <thead><tr><th>Día</th><th>Valle (MWh)</th><th>CQR (MWh)</th></tr></thead>
+        <tbody>
+          <tr><td>10 ago</td><td>5.256</td><td>2.947</td></tr>
+          <tr><td>11 ago</td><td>8.238</td><td>986</td></tr>
+          <tr><td>12 ago</td><td>4.931</td><td>635</td></tr>
+          <tr><td>13 ago</td><td>2.342</td><td>247</td></tr>
+          <tr><td>14 ago</td><td>2.228</td><td>139</td></tr>
+          <tr><td>15 ago</td><td>129</td><td>60</td></tr>
+          <tr><td>16–20 ago</td><td>0</td><td>343</td></tr>
+          <tr><td><b>Total</b></td><td><b>23.124</b></td><td><b>5.357</b></td></tr>
+        </tbody></table></div>
+      <div>
+        <ul class="sismo-l">
+          <li><b>28,5 GWh</b> no atendidos en 11 días: cerca del <b>38 %</b> de toda la DNA de 2026.</li>
+          <li><b>Valle del Cauca (CELSIA):</b> el pico fue el 11 de agosto (8.238 MWh). El 15 de agosto aún había cortes en Dagua, Versalles, Caicedonia, Calima-Darién, El Cairo, Sevilla, Buenaventura, Zarzal, Roldanillo, Bugalagrande, Riofrío, Yotoco, La Cumbre y Bolívar.</li>
+          <li><b>Risaralda (EEP):</b> afectaciones en Pereira; 39 MWh no atendidos el 15 de agosto.</li>
+          <li><b>Caldas (CHEC):</b> afectaciones en Viterbo; 15,9 MWh el 15 de agosto.</li>
+          <li><b>Quindío (EDEQ):</b> afectaciones en Génova; 5,1 MWh el 15 de agosto.</li>
+          <li><b>Recuperación:</b> el Valle normalizó el servicio el 16 de agosto (6 días); la CQR mantuvo cortes menores hasta el 20 de agosto.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">Fuente: XM, API de demanda no atendida por subárea, y reporte de eventos de DNA del CND del 15 de agosto de 2026 ("Continúa demanda no atendida por afectaciones al SDL, como consecuencia del sismo presentado en el país"). CQR: Caldas, Quindío y Risaralda.</p>
   </div>
   <p class="note">La DNA es la energía que no llegó a los usuarios. Puede deberse a fallas, mantenimientos o restricciones de la red, o, en una situación de escasez, a racionamiento. Datos preliminares de XM: el CND los valida después en su módulo de sucesos (SIO).</p>
 </section>
@@ -599,7 +632,7 @@ function drawDNA(){
   const pk=M.reduce((a,b)=>(b[1]+b[2])>(a[1]+a[2])?b:a);
   const car=X.sub.filter(r=>CAR.includes(r[0])).reduce((a,r)=>a+r[1],0);
   document.getElementById('txtdna').textContent=`En los últimos 30 días la demanda no atendida fue de ${nf(X.u30[0],1)} GWh (${nf(X.u30[1],2)} % de la demanda), frente a ${nf(X.anio[1],2)} % en lo que va del año. `+
-    `El mes más afectado fue ${['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'][+pk[0].slice(5)-1]} (${nf(pk[1]+pk[2],1)} GWh). Las subáreas del Caribe suman ${nf(car,1)} GWh en el año, con cortes frecuentes por restricciones de la red. `+
+    `El mes más afectado fue ${['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'][+pk[0].slice(5)-1]} (${nf(pk[1]+pk[2],1)} GWh)${pk[0]==='2026-08'?', por el sismo que dañó las redes de distribución del Valle y el Eje Cafetero':''}. Las subáreas del Caribe suman ${nf(car,1)} GWh en el año, con cortes frecuentes por restricciones de la red. `+
     `Estos niveles corresponden a eventos de red, no a falta de energía.`;
 }
 function all(){try{draw();draw2();draw3();draw4()}catch(e){console.error(e)}try{drawReg()}catch(e){console.error(e)}try{drawDNA()}catch(e){console.error(e)}heat();cuts()}
