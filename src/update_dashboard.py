@@ -130,7 +130,7 @@ def termicas(D, hoy):
     u7 = [d for d in dias if Dp.get(d)][-7:]
     gen7 = {c: sum(G[d].get(c, 0) for d in u7) / len(u7) / 24 for c in desp}
     dis7 = {c: sum(Dp.get(d, {}).get(c, 0) for d in u7) / len(u7) / 24 for c in desp}
-    nom = lambda c: ter[c]["Name"].title().replace("Cc", "CC").replace("Tebsab", "TEBSA").replace("Zipaemg", "Zipa")
+    nom = lambda c: ter[c]["Name"].title().replace("Cc", "CC").replace("Tebsab", "TEBSA").replace("Zipaemg", "Zipa").replace(" Iii", " III").replace(" Ii", " II")
     fuel = lambda c: ter[c].get("EnerSource", "").capitalize().replace("Carbon", "Carbón").replace("Combustoleo", "Combustóleo").replace("Acpm", "ACPM").replace("Jet-a1", "Jet A1").replace("Glp", "GLP")
     top = [[nom(c), fuel(c), round(gen7[c]), round(dis7[c])] for c in sorted(desp, key=lambda c: -gen7[c])[:12]]
     fuera = [[nom(c), fuel(c), mx[c], round(dis7.get(c, 0))] for c in sorted(mx, key=lambda c: -mx[c])
