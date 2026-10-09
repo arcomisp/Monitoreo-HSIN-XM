@@ -533,16 +533,16 @@ function drawReg(){
   charts.push(new Chart(document.getElementById('c11'),{type:'bar',data:{labels:rs.map(r=>REGN[r[0]]),datasets:[{data:rs.map(r=>r[1][0]),backgroundColor:rs.map(r=>r[0]=='SIN'?INK:W),borderRadius:4,barPercentage:.7,categoryPercentage:.9}]},options:o2,plugins:[endLabels]}));
   // diario
   const dd=D.reg.apd.days;let o3=base();
-  o3.scales.y.min=0;o3.scales.y.suggestedMax=120;o3.scales.y.ticks={callback:v=>v+' %'};
+  o3.scales.y.min=0;o3.scales.y.max=110;o3.scales.y.ticks={stepSize:20};o3.scales.y.ticks.callback=v=>v+' %';
   o3.scales.x.ticks.callback=(v,i)=>fdate(dd[i]);
   o3.plugins.tooltip.callbacks={title:i=>fdate(dd[i[0].dataIndex]),label:c=>`${c.dataset.label}: ${nf(c.raw,1)} %`};
   charts.push(new Chart(document.getElementById('c12'),{type:'line',data:{labels:dd,datasets:[
     {label:'Antioquia',data:D.reg.apd.ANTIOQUIA,borderColor:W,backgroundColor:W,borderWidth:2.25,pointRadius:3,pointHoverRadius:6},
-    {label:'SIN',data:D.reg.apd.SIN,borderColor:S,backgroundColor:S,borderWidth:2.25,pointRadius:3,pointHoverRadius:6}]},options:o3,plugins:[ref]}));
+    {label:'SIN',data:D.reg.apd.SIN,borderColor:S,backgroundColor:S,borderWidth:2.25,pointRadius:3,pointHoverRadius:6}]},options:o3,plugins:[{id:'ref100h',beforeDatasetsDraw(c){const y=c.scales.y.getPixelForValue(100),ctx=c.ctx;ctx.save();ctx.strokeStyle=css('--ink-2');ctx.setLineDash([5,4]);ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(c.chartArea.left,y);ctx.lineTo(c.chartArea.right,y);ctx.stroke();ctx.restore()}}]}));
   // texto
   const a=D.reg.apd.ANTIOQUIA,n=a.length,mn=Math.min(...a.filter(v=>v!=null));
   const peor=ap.filter(r=>r[0]!='SIN')[0],mejor=ap.filter(r=>r[0]!='SIN').slice(-1)[0];
-  let t=`En lo que va de ${MES[mi]}, la región con menores aportes es ${REGN[peor[0]]} (${nf(peor[1][0],0)} % de su media) y la de mayores es ${REGN[mejor[0]]} (${nf(mejor[1][0],0)} %). `;
+  const MESL=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];let t=`En lo que va de ${MESL[mi]}, la región con menores aportes es ${REGN[peor[0]]} (${nf(peor[1][0],0)} % de su media) y la de mayores es ${REGN[mejor[0]]} (${nf(mejor[1][0],0)} %). `;
   if(n>=3&&a[n-1]>mn+3)t+=`Antioquia, que pesa cerca del 55 % de los aportes del SIN, pasó de un mínimo de ${nf(mn,0)} % a ${nf(a[n-1],0)} % en su aporte diario: señal de recuperación, aún no tendencia.`;
   document.getElementById('txtreg').textContent=t;
 }
