@@ -78,11 +78,35 @@ def texto_termicas(T, pct, sin):
     fm = sum(r[2] for r in T.get("fuera", []))
     if fm >= 50:
         nombres = ", ".join(r[0] for r in T["fuera"][:3])
-        t += f" Hay {n(fm, 0)} MW térmicos sin disponibilidad (entre ellos {nombres}); recuperarlos sería el respaldo adicional más inmediato."
+        t += f" Hay {n(fm, 0)} MW térmicos sin disponibilidad (entre ellos {nombres})."
     if uso is not None and uso < 90 and sin < 80 and pct >= 70:
         t += " Con lluvias bajas y embalses aún altos, es un buen momento para generar más con térmicas y guardar agua para el verano."
     elif uso is not None and uso >= 95 and sin < 80:
         t += " Como las térmicas ya dan todo lo que pueden, cuidar el agua depende ahora de recuperar las plantas fuera de servicio y de asegurar el gas."
+    return t
+
+
+def texto_positivo(T, cap, v7, meta=95.0, factor=0.9):
+    """Conclusión positiva: cuánta agua se ahorraría si regresan las térmicas sin disponibilidad."""
+    fm = sum(r[2] for r in T.get("fuera", []))
+    if fm < 50 or not cap:
+        return None
+    pot = fm * 24 * factor / 1000            # GWh/día recuperables (supuesto: 90 % de uso)
+    pp_dia = pot / (cap / 100)                # puntos de reserva por día
+    t = (f"Hay respaldo que se puede recuperar. Si regresan las {len(T['fuera'])} plantas térmicas hoy sin disponibilidad ({n(fm, 0)} MW), "
+         f"podrían aportar unos {n(pot, 0)} GWh por día (suponiendo que operen al 90 %). Esa energía dejaría de salir de los embalses: equivale a ahorrar cerca de "
+         f"{n(pp_dia, 2)} puntos de reserva por día, unos {n(30 * pp_dia)} puntos por mes.")
+    if v7 is not None and v7 < 0:
+        caida = -v7 / 7
+        if pp_dia >= caida:
+            t += f" Es suficiente para frenar la caída actual de los embalses ({n(caida, 2)} puntos por día en la última semana)."
+        else:
+            t += (f" Con eso, la caída diaria de los embalses ({n(caida, 2)} puntos en promedio en la última semana) "
+                  f"se reduciría en {n(100 * pp_dia / caida, 0)} %.")
+    g = T["u7"]["gwh_dia"]
+    if g < meta <= g + pot:
+        t += f" Además, la generación térmica pasaría de {n(g)} a unos {n(g + pot, 0)} GWh por día y superaría la meta de {n(meta, 0)} GWh por día fijada para El Niño."
+    t += " Las térmicas no reemplazan la lluvia, pero sí ganan tiempo y protegen las reservas para el verano."
     return t
 
 
@@ -168,6 +192,9 @@ def main(path, md=False, tablero=None):
     if T and T.get("u7") and T.get("mensual"):
         try:
             p.append(("¿Cómo están ayudando las térmicas?", texto_termicas(T, pct, sin)))
+            tp = texto_positivo(T, cap, v7)
+            if tp:
+                p.append(("Una señal positiva: el respaldo que se puede recuperar", tp))
         except Exception:
             pass
 
