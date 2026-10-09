@@ -38,11 +38,25 @@ def daily(metric, entity, d0, d1):
     return out
 
 
-def region_map():
-    js = post("/lists", {"MetricId": "ListadoRios"})
+def region_map(metric="ListadoRios"):
+    js = post("/lists", {"MetricId": metric})
     m = {e["Values"]["Name"]: e["Values"]["HydroRegion"] for it in js["Items"] for e in it["ListEntities"]}
-    m.setdefault("AMOYA", "CENTRO")
+    if metric == "ListadoRios":
+        m.setdefault("AMOYA", "CENTRO")
     return m
+
+
+def reservas_region(day, emap):
+    k = day.isoformat()
+    vol = daily("VoluUtilDiarEner", "Embalse", day, day).get(k, {})
+    cap = daily("CapaUtilDiarEner", "Embalse", day, day).get(k, {})
+    agg = {r: [0.0, 0.0] for r in REG}
+    for name, v in vol.items():
+        r = emap.get(name)
+        if r in agg and name in cap:
+            agg[r][0] += v
+            agg[r][1] += cap[name]
+    return agg
 
 
 def eom(y, m):
@@ -138,6 +152,24 @@ def main(src, dst):
         for g in list(D.get("h95", {})):
             while len(D["h95"][g]) <= mi:
                 D["h95"][g].append(None)
+
+    # --- Por región: reservas (corte vs cierre del mes anterior) y aporte diario del mes en curso
+    emap = region_map("ListadoEmbalses")
+    prev_close = L.replace(day=1) - dt.timedelta(days=1)
+    r_now, r_prev = reservas_region(L, emap), reservas_region(prev_close, emap)
+    res_reg = {g: [round(100 * r_now[g][0] / r_now[g][1], 2), round(r_now[g][0], 1), round(r_now[g][1], 1),
+                   round(100 * r_prev[g][0] / r_prev[g][1], 2), round(r_prev[g][0], 1)] for g in REG if r_now[g][1] and r_prev[g][1]}
+    mes_days = [x for x in ap_days if x[:7] == corte_ap[:7]]
+    apd_reg = {"days": mes_days}
+    for g in REG:
+        serie = []
+        for x in mes_days:
+            a = sum(v for n, v in R[x].items() if rm.get(n) == g)
+            h = sum(v for n, v in H.get(x, {}).items() if rm.get(n) == g)
+            serie.append(round(100 * a / h, 1) if h else None)
+        apd_reg[g] = serie
+    apd_reg["SIN"] = [round(100 * sum(R[x].values()) / sum(H[x].values()), 1) for x in mes_days]
+    D["reg"] = {"fecha": last, "prev": prev_close.isoformat(), "res": res_reg, "apd": apd_reg}
 
     def hist_mes(key, x, nat):
         same = [r for r in D[key] if r[0][:7] == x[:7]]
