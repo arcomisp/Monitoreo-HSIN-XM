@@ -119,7 +119,7 @@ def termicas(D, hoy):
         g = sum(x for c, x in G[d].items() if c in desp)
         dp = sum(x for c, x in Dp.get(d, {}).items() if c in desp)
         tg = sum(x for c, x in G[d].items() if c in ter)
-        dia[d] = [d, round(g / 24), round(dp / 24), round(tg / 1e3, 2)]
+        dia[d] = [d, round(g / 24), round(dp / 24) if dp > 0 else None, round(tg / 1e3, 2)]  # None: XM sin dato de disponibilidad
     diario = [dia[k] for k in sorted(dia)][-60:]
     # capacidad máxima observada (MW) por planta despachada, conservada entre corridas
     mx = T.get("maxmw", {})
@@ -127,7 +127,7 @@ def termicas(D, hoy):
         for c, x in v.items():
             if c in desp:
                 mx[c] = max(mx.get(c, 0), round(x / 24))
-    u7 = dias[-7:]
+    u7 = [d for d in dias if Dp.get(d)][-7:]
     gen7 = {c: sum(G[d].get(c, 0) for d in u7) / len(u7) / 24 for c in desp}
     dis7 = {c: sum(Dp.get(d, {}).get(c, 0) for d in u7) / len(u7) / 24 for c in desp}
     nom = lambda c: ter[c]["Name"].title().replace("Cc", "CC").replace("Tebsab", "TEBSA").replace("Zipaemg", "Zipa")
