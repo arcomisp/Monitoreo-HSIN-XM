@@ -1,5 +1,6 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Senda Hídrica SIN 2026</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" referrerpolicy="no-referrer">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -106,6 +107,11 @@ table.data th:first-child,table.data td:first-child{text-align:left;font-family:
 .gratis b{color:var(--ink);font-size:15px}
 .gratis span{color:var(--ink-2);font-size:14px}
 .gratis a{color:var(--water);font-weight:600}
+.redes{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:4px 0 8px}
+.redes span{color:var(--ink);font-size:13.5px;font-weight:600;margin-right:4px}
+.redes a.red{width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--ink);color:var(--ink);background:transparent;font-size:16px;text-decoration:none;transition:background .15s,color .15s}
+.redes a.red:hover{background:var(--ink);color:var(--bg)}
+.redes a.red:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padding-top:14px;display:flex;flex-direction:column;gap:4px}
 #tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:6px 9px;border-radius:6px;font-family:var(--f-mono);display:none;z-index:9;max-width:240px}
 @media (max-width:760px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:minmax(0,1fr)}.cv{height:300px}.kpi .v{font-size:27px}}
@@ -238,10 +244,11 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
   </div>
 </section>
 
-<section class="gratis" aria-label="Servicio gratuito"><b>Servicio de consulta gratuito</b><span>Este tablero es de libre acceso y se actualiza todos los días. Si le resulta útil, le agradezco <a href="https://www.linkedin.com/in/alejandro-aroca-ssecc" target="_blank" rel="noopener">seguirme en LinkedIn</a> y apoyar mis publicaciones con un like y un repost.</span></section>
+<section class="gratis" aria-label="Servicio gratuito"><b>Servicio de consulta gratuito</b><span>Este tablero es de libre acceso y se actualiza todos los días. Si le resulta útil, le agradezco seguirme en mis redes sociales y apoyar mis publicaciones con un like y un repost.</span></section>
 
 <footer>
-  <div class="contacto"><b>Para contacto, haga clic aquí:</b><a href="https://2ubcards.idencol.com/alejandro-aroca/" target="_blank" rel="noopener">Tarjeta digital</a><a class="sec2" href="https://www.linkedin.com/in/alejandro-aroca-ssecc" target="_blank" rel="noopener">LinkedIn</a></div>
+  <div class="contacto"><b>Para contacto, haga clic aquí:</b><a href="https://2ubcards.idencol.com/alejandro-aroca/" target="_blank" rel="noopener">Tarjeta digital</a></div>
+  <div class="redes" aria-label="Redes sociales"><span>Sígame en redes:</span><a class="red" href="https://www.linkedin.com/in/alejandro-aroca-ssecc" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn"><i class="fa-brands fa-linkedin-in" aria-hidden="true"></i></a><a class="red" href="https://x.com/alejandroarocad" target="_blank" rel="noopener" aria-label="X" title="X"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></a><a class="red" href="https://www.instagram.com/alejandroarocad" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a><a class="red" href="https://www.facebook.com/AlejandroArocaD/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook"><i class="fa-brands fa-facebook-f" aria-hidden="true"></i></a><a class="red" href="https://www.youtube.com/@alejandroarocad" target="_blank" rel="noopener" aria-label="YouTube" title="YouTube"><i class="fa-brands fa-youtube" aria-hidden="true"></i></a><a class="red" href="https://www.tiktok.com/@alejandroarocad" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok"><i class="fa-brands fa-tiktok" aria-hidden="true"></i></a></div>
 
   <span><b style="color:var(--ink);font-weight:600">Alejandro Aroca</b> · Ingeniero Eléctrico · Consultor y Auditor Senior en Proyectos de Energía</span>
   
