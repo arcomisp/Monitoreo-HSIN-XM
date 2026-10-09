@@ -228,10 +228,31 @@ def main(src, dst):
     u30, u30p = dna_rango(DL - dt.timedelta(days=29))
     anio_g = sum(v[0] + v[1] for v in mens.values())
     anio_d = sum(v[2] for v in mens.values())
+    # Caribe: consolidado por subárea (los 7 departamentos continentales)
+    CARIBE = {"SUBAREA GCM": "GCM", "SUBAREA ATLANTICO": "Atlántico", "SUBAREA BOLIVAR": "Bolívar", "SUBAREA CORDOBA_SUCRE": "Córdoba-Sucre"}
+    d30 = (DL - dt.timedelta(days=29)).isoformat()
+    car = {v: {"mes": {}, "anio": 0.0, "u30": 0.0, "dias": set()} for v in CARIBE.values()}
+    car_dias = set()
+    for src in (dna_p, dna_n):
+        for d, v in src.items():
+            for k, val in v.items():
+                if k in CARIBE:
+                    e = car[CARIBE[k]]
+                    e["mes"][d[:7]] = e["mes"].get(d[:7], 0.0) + val
+                    e["anio"] += val
+                    if d >= d30:
+                        e["u30"] += val
+                    if val > 0:
+                        e["dias"].add(d); car_dias.add(d)
+    meses = sorted(mens)
+    caribe = {"meses": meses,
+              "sub": {k: {"mes": [round(e["mes"].get(m, 0.0), 3) for m in meses], "anio": round(e["anio"], 2),
+                          "u30": round(e["u30"], 2), "dias": len(e["dias"])} for k, e in car.items()},
+              "dias_total": len(car_dias)}
     D["dna"] = {"fecha": dlast,
                 "mensual": [[m, round(v[0], 2), round(v[1], 2), round(v[2], 0)] for m, v in sorted(mens.items())],
                 "sub": [[n, round(v[0], 2), len(v[1])] for n, v in sorted(sub.items(), key=lambda z: -z[1][0])[:10]],
-                "u30": [u30, u30p], "anio": [round(anio_g, 2), round(100 * anio_g / anio_d, 3) if anio_d else None]}
+                "u30": [u30, u30p], "anio": [round(anio_g, 2), round(100 * anio_g / anio_d, 3) if anio_d else None], "caribe": caribe}
 
     g, c = res[last]
     D["meta"].update(fecha=last, E=round(g, 1), cap=round(c, 1), parcial=CA != eom(CA.year, CA.month), dia=CA.day,
