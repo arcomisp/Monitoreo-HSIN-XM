@@ -135,6 +135,11 @@ table.data th:first-child,table.data td:first-child{text-align:left;font-family:
 .sismo>p{margin:0;color:var(--ink-2);max-width:80ch}
 .sismo-l{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink-2)}
 .sub-h{margin:0;font-family:var(--f-display);font-stretch:90%;font-size:17px}
+.ago-h{margin:4px 0 0;font-size:15px;font-family:var(--f-display);font-stretch:90%}
+.ago-k{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.ago-k div{border:1px solid var(--rule);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.ago-k span{font-size:12px;color:var(--ink-2)}.ago-k b{font-family:var(--f-display);font-stretch:85%;font-size:24px}.ago-k em{font-style:normal;font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3)}
+@media (max-width:760px){.ago-k{grid-template-columns:repeat(2,minmax(0,1fr))}}
 footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padding-top:14px;display:flex;flex-direction:column;gap:4px}
 #tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:6px 9px;border-radius:6px;font-family:var(--f-mono);display:none;z-index:9;max-width:240px}
 @media (max-width:760px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:minmax(0,1fr)}.cv{height:300px}.kpi .v{font-size:27px}}
@@ -215,6 +220,16 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
   <div class="card sismo">
     <h3>Evento destacado: el sismo de agosto de 2026 en el Valle y el Eje Cafetero</h3>
     <p>A partir del <b>10 de agosto</b>, el sismo dañó las <b>redes de distribución local (SDL)</b> del Valle del Cauca y de Caldas, Quindío y Risaralda. No afectó la generación ni la red de transmisión nacional: la energía estaba disponible, pero no podía llegar a los usuarios por los daños en las redes de los operadores.</p>
+    <h4 class="ago-h">Agosto de 2026 por separado: cuánto fue el sismo y cuánto lo habitual</h4>
+    <div class="ago-k">
+      <div><span>DNA total de agosto</span><b>34,5 GWh</b><em>0,45 % de la demanda del mes</em></div>
+      <div><span>Por el sismo (Valle y CQR)</span><b>28,5 GWh</b><em>82 % de la DNA de agosto</em></div>
+      <div><span>Resto de agosto</span><b>6,0 GWh</b><em>0,08 % de la demanda</em></div>
+      <div><span>Promedio de los demás meses</span><b>4,9 GWh</b><em>enero a septiembre, sin agosto</em></div>
+    </div>
+    <div class="legend"><span><i class="sw box" style="background:var(--senda)"></i>DNA por el sismo</span><span><i class="sw box" style="background:var(--water)"></i>Resto del país</span></div>
+    <div class="cv sm"><canvas id="c15" aria-label="Demanda no atendida diaria de agosto de 2026, separando el efecto del sismo" role="img"></canvas></div>
+    <p class="note" style="margin-top:0">Sin el sismo, agosto habría tenido 6,0 GWh de DNA, en línea con un mes normal. Es decir, el aumento de agosto se explica casi por completo por el terremoto y no por falta de energía ni por un deterioro general de la red.</p>
     <div class="grid2">
       <div class="tw"><table class="data" style="min-width:0" aria-label="Demanda no atendida diaria por el sismo, en MWh">
         <thead><tr><th>Día</th><th>Valle (MWh)</th><th>CQR (MWh)</th></tr></thead>
@@ -665,7 +680,16 @@ function drawCaribe(){
   o.plugins.tooltip.callbacks={title:i=>MES[+C.meses[i[0].dataIndex].slice(5)-1]+' '+C.meses[i[0].dataIndex].slice(0,4),label:c=>`${c.dataset.label}: ${nf(c.raw,2)} GWh`};
   charts.push(new Chart(document.getElementById('c14'),{type:'bar',data:{labels:C.meses,datasets:ORD.map(x=>({label:x[0],data:C.sub[x[0]].mes,backgroundColor:css(x[2]),borderColor:css('--surface'),borderWidth:{top:2}}))},options:o}));
 }
-function all(){try{draw();draw2();draw3();draw4()}catch(e){console.error(e)}try{drawReg()}catch(e){console.error(e)}try{drawDNA()}catch(e){console.error(e)}try{drawCaribe()}catch(e){console.error(e)}heat();cuts()}
+
+function drawAgosto(){
+  const SIS=[0, 0, 0, 0, 0, 0, 0, 0, 0, 8.202, 9.224, 5.566, 2.589, 2.367, 0.189, 0.181, 0.051, 0.049, 0.031, 0.031, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], RES=[0.096, 0.303, 0.092, 0.085, 0.037, 0.034, 0.05, 0.147, 0.073, 0.274, 0.18, 0.302, 0.073, 0.041, 0.02, 0.757, 0.213, 0.046, 0.259, 0.096, 0.054, 0.63, 0.148, 0.087, 0.064, 0.093, 0.625, 0.065, 0.732, 0.301, 0.076];
+  const lab=SIS.map((_,i)=>String(i+1));let o=base();o.scales.x.stacked=true;o.scales.y.stacked=true;o.scales.y.ticks={callback:v=>v+' GWh'};
+  o.plugins.tooltip.callbacks={title:i=>(i[0].dataIndex+1)+' de agosto',label:c=>`${c.dataset.label}: ${nf(c.raw,2)} GWh`,footer:i=>`Total: ${nf(SIS[i[0].dataIndex]+RES[i[0].dataIndex],2)} GWh`};
+  charts.push(new Chart(document.getElementById('c15'),{type:'bar',data:{labels:lab,datasets:[
+    {label:'Por el sismo',data:SIS,backgroundColor:css('--senda'),borderColor:css('--surface'),borderWidth:{top:2}},
+    {label:'Resto del país',data:RES,backgroundColor:css('--water'),borderRadius:2}]},options:o}));
+}
+function all(){try{draw();draw2();draw3();draw4()}catch(e){console.error(e)}try{drawReg()}catch(e){console.error(e)}try{drawDNA()}catch(e){console.error(e)}try{drawCaribe()}catch(e){console.error(e)}try{drawAgosto()}catch(e){console.error(e)}heat();cuts()}
 function boot(){ kpis(); semaforo(); if(window.Chart){all()} else {heat();cuts()} }
 if(document.fonts&&document.fonts.ready){document.fonts.ready.then(boot)}else boot();
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',all);
