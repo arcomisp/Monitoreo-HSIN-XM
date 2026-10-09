@@ -197,6 +197,10 @@ def main(src, dst):
         if all(x in apdd for x in dd) and w not in wk:
             wk[w] = [w, round(sum(apdd[x] for x in dd) / 7, 1), mn, pr, mx]
     D["weekly"] = [wk[k] for k in sorted(wk)]
+    # escenario de aportes de la senda (promedio de 100 series, GWh/día) por semana
+    esc = {r[0]: r[3] for r in D["weekly"]}
+    esc.update({w: v[1] for w, v in ESC.items()})
+    D["esc"] = dict(sorted(esc.items()))
 
     g, c = res[last]
     D["meta"].update(fecha=last, E=round(g, 1), cap=round(c, 1), parcial=CA != eom(CA.year, CA.month), dia=CA.day,
