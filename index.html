@@ -119,6 +119,16 @@ table.data th:first-child,table.data td:first-child{text-align:left;font-family:
 .legal b{font-size:13px}
 .legal p{margin:4px 0 0;font-size:12.5px;color:var(--ink-3);line-height:1.5}
 .subt{margin:2px 0 4px;font-family:var(--f-display);font-stretch:85%;font-weight:600;font-size:clamp(17px,2.4vw,21px);color:var(--water)}
+.dx-card{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.dx-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.dx-fecha{font-family:var(--f-mono);font-size:12.5px;color:var(--ink-3)}
+.dx-nivel{font-weight:700;font-size:14px;padding:4px 12px;border-radius:99px;color:var(--ink)}
+.dx-bajo{background:#1baf7a2e}.dx-moderado{background:#eda10033}.dx-alto{background:#e3494833}
+.dx-card h3{margin:0 0 4px;font-size:15.5px;font-family:var(--f-display);font-stretch:90%}
+.dx-card p{margin:0;font-size:15px;line-height:1.55;color:var(--ink-2);max-width:80ch}
+.dx-final{border-top:1px solid var(--rule);padding-top:12px}
+.dx-final p{color:var(--ink)}
+.dx-nota{font-size:12px!important;color:var(--ink-3)!important}
 footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padding-top:14px;display:flex;flex-direction:column;gap:4px}
 #tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:6px 9px;border-radius:6px;font-family:var(--f-mono);display:none;z-index:9;max-width:240px}
 @media (max-width:760px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:minmax(0,1fr)}.cv{height:300px}.kpi .v{font-size:27px}}
@@ -134,6 +144,11 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
   <div class="author"><span>Análisis de <b>Alejandro Aroca</b>, Ingeniero Eléctrico · Consultor y Auditor Senior en Proyectos de Energía</span><a href="https://www.linkedin.com/in/alejandro-aroca-ssecc" target="_blank" rel="noopener">LinkedIn</a></div>
 <p class="upd"><i aria-hidden="true"></i><span><b>Se actualiza automáticamente todos los días</b> con datos oficiales de XM, mediante un sistema inteligente de análisis de datos desarrollado en Python por el Ing. Alejandro Aroca.<span id="upd-corte"></span></span></p>
 </header>
+
+<section class="sec dx" id="conclusion" aria-label="Conclusión del día">
+  <h2>Conclusión del día</h2>
+  <div class="dx-card" id="dx"><p>Cargando la conclusión del día…</p></div>
+</section>
 
 <section class="kpis" id="kpis" aria-label="Resumen"></section>
 
@@ -561,4 +576,7 @@ fetch('reportes/ULTIMO.html',{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;retur
 (function(){try{var f=D.meta.fecha.split('-'),m=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];document.getElementById('upd-corte').textContent=' Último corte: '+(+f[2])+' de '+m[+f[1]-1]+' de '+f[0]+'.';}catch(e){}})();
 </script>
 <script data-goatcounter="https://arcomisp.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script>
+fetch('reportes/DIAGNOSTICO.html',{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.text()}).then(h=>{document.getElementById('dx').innerHTML=h}).catch(()=>{document.getElementById('conclusion').hidden=true});
+</script>
 </body></html>
