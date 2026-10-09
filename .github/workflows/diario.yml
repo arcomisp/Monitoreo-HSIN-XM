@@ -1,0 +1,50 @@
+name: Análisis diario XM
+
+on:
+  schedule:
+    - cron: "40 12 * * *"   # 7:40 a.m. hora de Colombia (UTC-5)
+  workflow_dispatch: {}      # permite ejecutarlo a mano desde la pestaña Actions
+  push:                      # también corre cuando cambia el código o el flujo
+    branches: [main]
+    paths: ["src/**", ".github/workflows/**"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: analisis-diario
+  cancel-in-progress: false
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Calcular indicadores (aportes, reservas, senda, vertimientos)
+        run: |
+          python3 src/xm_brief.py > /tmp/xm.json
+          FECHA=$(python3 -c "import json;print(json.load(open('/tmp/xm.json'))['corte_aportes'])")
+          echo "FECHA=$FECHA" >> "$GITHUB_ENV"
+          mkdir -p reportes/json
+          cp /tmp/xm.json "reportes/json/$FECHA.json"
+          python3 src/brief_md.py /tmp/xm.json > "reportes/$FECHA.md"
+          cp "reportes/$FECHA.md" reportes/ULTIMO.md
+          python3 src/brief_md.py /tmp/xm.json --html > reportes/ULTIMO.html
+          cat reportes/ULTIMO.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Actualizar tablero
+        run: python3 src/update_dashboard.py dashboard/index.html dashboard/index.html
+
+      - name: Guardar cambios
+        run: |
+          git config user.name "xm-bot"
+          git config user.email "xm-bot@users.noreply.github.com"
+          git add -A reportes dashboard
+          git diff --cached --quiet || git commit -m "Datos XM al $FECHA"
+          git push
