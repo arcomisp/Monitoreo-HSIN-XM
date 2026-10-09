@@ -102,6 +102,10 @@ table.data th:first-child,table.data td:first-child{text-align:left;font-family:
 .upd{display:flex;align-items:flex-start;gap:8px;margin-top:10px;padding:10px 12px;border:1px solid var(--rule);border-left:4px solid var(--water);border-radius:8px;background:var(--surface);font-size:13.5px;color:var(--ink-2);max-width:72ch}
 .upd i{flex:none;width:8px;height:8px;margin-top:6px;border-radius:50%;background:var(--c3)}
 .upd b{color:var(--ink);font-weight:600}
+.gratis{background:var(--surface);border:1px solid var(--rule);border-left:4px solid var(--c3);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;max-width:72ch}
+.gratis b{color:var(--ink);font-size:15px}
+.gratis span{color:var(--ink-2);font-size:14px}
+.gratis a{color:var(--water);font-weight:600}
 footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padding-top:14px;display:flex;flex-direction:column;gap:4px}
 #tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:6px 9px;border-radius:6px;font-family:var(--f-mono);display:none;z-index:9;max-width:240px}
 @media (max-width:760px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:minmax(0,1fr)}.cv{height:300px}.kpi .v{font-size:27px}}
@@ -233,6 +237,8 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
     <p class="note">La capacidad útil cambió durante el año (Guavio +528 GWh el 30 de junio, Ituango +187 GWh el 5 de octubre). Por eso el Δ pp no siempre coincide con el Δ GWh. Vertido en el mes: agua que salió de los embalses sin generar, en GWh equivalentes<span id="vhasta"></span>.</p>
   </div>
 </section>
+
+<section class="gratis" aria-label="Servicio gratuito"><b>Servicio de consulta gratuito</b><span>Este tablero es de libre acceso y se actualiza todos los días. Si le resulta útil, le agradezco <a href="https://www.linkedin.com/in/alejandro-aroca-ssecc" target="_blank" rel="noopener">seguirme en LinkedIn</a> y apoyar mis publicaciones con un like y un repost.</span></section>
 
 <footer>
   <div class="contacto"><b>Para contacto, haga clic aquí:</b><a href="https://2ubcards.idencol.com/alejandro-aroca/" target="_blank" rel="noopener">Tarjeta digital</a><a class="sec2" href="https://www.linkedin.com/in/alejandro-aroca-ssecc" target="_blank" rel="noopener">LinkedIn</a></div>
