@@ -28,11 +28,11 @@ Si las lluvias no llegan y los embalses bajaran todos los días al ritmo de la p
 
 1. Recuperar las térmicas paradas (unos 18 GWh por día): 66,3 %, 3,5 puntos por encima de la CAR.
 
-2. Sumar ahorro voluntario del 2 % de la demanda con campañas y respuesta de la demanda (unos 5 GWh por día): 67,8 %, 4,9 puntos por encima de la CAR.
+2. Que el programa de ahorro de la CREG (resoluciones 101 120 y 101 126 de 2026), vigente desde septiembre, logre un ahorro del 2 % de la demanda (unos 5 GWh por día): 67,8 %, 4,9 puntos por encima de la CAR.
 
 3. Solo como último recurso, racionamiento programado del 5 %, anunciado y por horarios y sectores (unos 12 GWh por día): 71,4 %, 8,6 puntos por encima de la CAR.
 
-Hoy no se requiere racionamiento: las reservas están 22,8 puntos por encima de la CAR. El escenario muestra que la prioridad es recuperar las térmicas y promover el ahorro voluntario, para no tener que llegar a cortes programados.
+Hoy no se requiere racionamiento: las reservas están 22,8 puntos por encima de la CAR. El escenario muestra que la prioridad es recuperar las térmicas y que el programa de ahorro de la CREG dé resultados, para no tener que llegar a cortes programados.
 
 ## ¿La energía está llegando a los usuarios?
 

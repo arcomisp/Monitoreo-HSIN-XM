@@ -160,7 +160,7 @@ def escenario_adverso(D, r, T):
     pasos_m = []
     if pot > 0:
         pasos_m.append((pot, f"Recuperar las térmicas paradas (unos {n(pot, 0)} GWh por día)"))
-    pasos_m.append((vol, f"Sumar ahorro voluntario del 2 % de la demanda con campañas y respuesta de la demanda (unos {n(vol, 0)} GWh por día)"))
+    pasos_m.append((vol, f"Que el programa de ahorro de la CREG (resoluciones 101 120 y 101 126 de 2026), vigente desde septiembre, logre un ahorro del 2 % de la demanda (unos {n(vol, 0)} GWh por día)"))
     pasos_m.append((rac, f"Solo como último recurso, racionamiento programado del 5 %, anunciado y por horarios y sectores (unos {n(rac, 0)} GWh por día)"))
     for k, (gw, txt) in enumerate(pasos_m, 1):
         acum += gw
@@ -168,7 +168,7 @@ def escenario_adverso(D, r, T):
         items.append(f"{k}. {txt}: {n(x)} %{vs_car(x)}.")
     margen = r["pct"] - (r.get("car_pct") or 0)
     cierre = (f"Hoy no se requiere racionamiento: las reservas están {n(margen)} puntos por encima de la CAR. "
-              "El escenario muestra que la prioridad es recuperar las térmicas y promover el ahorro voluntario, para no tener que llegar a cortes programados.")
+              "El escenario muestra que la prioridad es recuperar las térmicas y que el programa de ahorro de la CREG dé resultados, para no tener que llegar a cortes programados.")
     return [intro] + items + [cierre]
 
 
