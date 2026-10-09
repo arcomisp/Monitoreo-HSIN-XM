@@ -107,8 +107,8 @@ def main(path, md=False):
         print("\n".join(out))
         return
     e = html.escape
-    out = [f'<div class="dx-head"><span class="dx-fecha">Corte: {e(fecha(r["fecha"]))}</span>'
-           f'<span class="dx-nivel dx-{color}">Riesgo {nivel}</span></div>']
+    out = [f'<div class="dx-head"><span class="dx-nivel dx-{color}">Riesgo {nivel}</span>'
+           f'<span class="dx-fecha">Corte: {e(fecha(r["fecha"]))}</span></div>']
     for h, t in p:
         cls = ' class="dx-final"' if h.startswith("Diagnóstico") else ""
         out.append(f"<div{cls}><h3>{e(h)}</h3><p>{e(t)}</p></div>")
