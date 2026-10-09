@@ -14,6 +14,10 @@ Los ríos están trayendo menos agua de lo normal: en lo que va de octubre llega
 
 En la última semana las reservas bajaron 1,3 puntos. Para llegar a la meta de fin de mes (79,5 % el 31 de octubre de 2026), los embalses necesitarían ganar unos 826 GWh en 23 días, es decir, recibir más agua de la que se usa para generar energía. Eso depende de que las lluvias se fortalezcan.
 
+## ¿La energía está llegando a los usuarios?
+
+En los últimos 30 días la demanda no atendida fue de 5,4 GWh, el 0,08 % de la demanda del país, un nivel normal. Es el nivel típico de eventos y restricciones en las redes (fallas, mantenimientos, equipos al límite) y no muestra señales de cortes por escasez de agua.
+
 ## Diagnóstico del día: riesgo MODERADO
 
 No hay riesgo inmediato para el abastecimiento de energía: los embalses tienen un margen amplio sobre el nivel de seguridad. Pero las lluvias están por debajo de lo normal y las reservas no alcanzan la meta planeada, así que conviene vigilar la evolución y prepararse con medidas preventivas (uso eficiente de la energía, disponibilidad de generación térmica y de gas), sin alarma.
