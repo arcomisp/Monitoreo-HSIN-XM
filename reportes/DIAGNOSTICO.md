@@ -1,38 +1,38 @@
-# Conclusión del día · 8 de octubre de 2026
+# Conclusión del día · 9 de octubre de 2026
 
 **Nivel de riesgo: MODERADO**
 
 ## ¿Cuánta agua hay?
 
-Los embalses del país tienen hoy agua equivalente al 74,8 % de su capacidad (13.212 GWh). Esto está 22,8 puntos por encima del nivel mínimo de seguridad que vigila el regulador (CAR, 52,0 %) y 3,0 puntos por debajo de la meta planeada para esta fecha (Senda de Referencia, 77,9 %).
+Los embalses del país tienen hoy agua equivalente al 74,9 % de su capacidad (13.226 GWh). Esto está 22,9 puntos por encima del nivel mínimo de seguridad que vigila el regulador (CAR, 52,0 %) y 2,9 puntos por debajo de la meta planeada para esta fecha (Senda de Referencia, 77,9 %).
 
 ## ¿Cuánta agua está llegando?
 
-Los ríos están trayendo menos agua de lo normal: en lo que va de octubre llega el 54 % de lo habitual para estos días. La región más afectada es Antioquia (40 %), la de mayor peso en el sistema, y la mejor es Caribe (111 %). Hay una señal positiva: el aporte diario del sistema subió de un mínimo de 42 % a 57 % en los últimos días. Aún no es una tendencia, pero va en la dirección correcta.
+Los ríos están trayendo menos agua de lo normal: en lo que va de octubre llega el 55 % de lo habitual para estos días. La región más afectada es Antioquia (41 %), la de mayor peso en el sistema, y la mejor es Caribe (108 %). Hay una señal positiva: el aporte diario del sistema subió de un mínimo de 42 % a 66 % en los últimos días. Aún no es una tendencia, pero va en la dirección correcta.
 
 ## ¿Hacia dónde va?
 
-En la última semana las reservas bajaron 1,3 puntos. Para llegar a la meta de fin de mes (79,5 % el 31 de octubre de 2026), los embalses necesitarían ganar unos 826 GWh en 23 días, es decir, recibir más agua de la que se usa para generar energía. Eso depende de que las lluvias se fortalezcan.
+En la última semana las reservas bajaron 1,2 puntos. Para llegar a la meta de fin de mes (79,5 % el 31 de octubre de 2026), los embalses necesitarían ganar unos 808 GWh en 22 días, es decir, recibir más agua de la que se usa para generar energía. Eso depende de que las lluvias se fortalezcan.
 
 ## ¿Cómo están ayudando las térmicas?
 
-En la última semana las plantas térmicas generaron 83,4 GWh por día, el 34 % de la energía del país (en enero era el 12 %). Mientras más energía aportan las térmicas, menos agua se saca de los embalses. Están entregando el 97 % de lo que tienen disponible: prácticamente al tope, sin margen térmico adicional. La potencia térmica disponible bajó de unos 4.418 MW hace un mes a 3.522 MW, lo que reduce el respaldo. El uso de combustibles líquidos (ACPM, combustóleo, jet), los más costosos, subió a 14,8 GWh por día, frente a 2,1 hace tres meses: suele indicar que el gas disponible no alcanza y presiona al alza el precio de la energía. Hay 847 MW térmicos sin disponibilidad (entre ellos Gecelca 32, Termovalle CC, Guajira 1). Como las térmicas ya dan todo lo que pueden, cuidar el agua depende ahora de recuperar las plantas fuera de servicio y de asegurar el gas.
+En la última semana las plantas térmicas generaron 84,8 GWh por día, el 35 % de la energía del país (en enero era el 12 %). Mientras más energía aportan las térmicas, menos agua se saca de los embalses. Están entregando el 97 % de lo que tienen disponible: prácticamente al tope, sin margen térmico adicional. La potencia térmica disponible bajó de unos 4.353 MW hace un mes a 3.586 MW, lo que reduce el respaldo. El uso de combustibles líquidos (ACPM, combustóleo, jet), los más costosos, subió a 14,9 GWh por día, frente a 2,1 hace tres meses: suele indicar que el gas disponible no alcanza y presiona al alza el precio de la energía. Hay 1.011 MW térmicos sin disponibilidad (entre ellos Gecelca 32, Termovalle CC, Merilectrica 1). Como las térmicas ya dan todo lo que pueden, cuidar el agua depende ahora de recuperar las plantas fuera de servicio y de asegurar el gas.
 
 ## Una señal positiva: el respaldo que se puede recuperar
 
-Hay respaldo que se puede recuperar. Si regresan las 7 plantas térmicas hoy sin disponibilidad (847 MW), podrían aportar unos 18 GWh por día (suponiendo que operen al 90 %). Esa energía dejaría de salir de los embalses: equivale a ahorrar cerca de 0,10 puntos de reserva por día, unos 3,1 puntos por mes. Es más que lo que están bajando hoy los embalses (14 GWh por día en la última semana): con esas plantas de vuelta, las reservas dejarían de caer al ritmo actual. Además, la generación térmica pasaría de 83,4 a unos 102 GWh por día y superaría la meta de 95 GWh por día fijada para El Niño. Las térmicas no reemplazan la lluvia, pero sí ganan tiempo y protegen las reservas para el verano.
+Hay respaldo que se puede recuperar. Si regresan las 8 plantas térmicas hoy sin disponibilidad (1.011 MW), podrían aportar unos 22 GWh por día (suponiendo que operen al 90 %). Esa energía dejaría de salir de los embalses: equivale a ahorrar cerca de 0,12 puntos de reserva por día, unos 3,7 puntos por mes. Es más que lo que están bajando hoy los embalses (13 GWh por día en la última semana): con esas plantas de vuelta, las reservas dejarían de caer al ritmo actual. Además, la generación térmica pasaría de 84,8 a unos 107 GWh por día y superaría la meta de 95 GWh por día fijada para El Niño. Las térmicas no reemplazan la lluvia, pero sí ganan tiempo y protegen las reservas para el verano.
 
 ## Si las lluvias no llegan: escenario adverso y medidas
 
-Si las lluvias no llegan y los embalses bajaran todos los días al ritmo de la peor semana del último mes (47 GWh por día, semana al 24 de septiembre de 2026), llegarían al 30 de noviembre de 2026, inicio del verano, con 60,9 %, 2,0 puntos por debajo de la CAR (62,9 % en esa fecha). Es un escenario de cautela, no un pronóstico. Las medidas, en orden de prioridad, y el nivel con que llegarían los embalses a esa fecha:
+Si las lluvias no llegan y los embalses bajaran todos los días al ritmo de la peor semana del último mes (47 GWh por día, semana al 24 de septiembre de 2026), llegarían al 30 de noviembre de 2026, inicio del verano, con 61,2 %, 1,7 puntos por debajo de la CAR (62,9 % en esa fecha). Es un escenario de cautela, no un pronóstico. Las medidas, en orden de prioridad, y el nivel con que llegarían los embalses a esa fecha:
 
-1. Recuperar las térmicas paradas (unos 18 GWh por día): 66,3 %, 3,5 puntos por encima de la CAR.
+1. Recuperar las térmicas paradas (unos 22 GWh por día): 67,6 %, 4,8 puntos por encima de la CAR.
 
-2. Que el programa de ahorro de la CREG (resoluciones 101 120 y 101 126 de 2026), vigente desde septiembre, logre un ahorro del 2 % de la demanda (unos 5 GWh por día): 67,8 %, 4,9 puntos por encima de la CAR.
+2. Que el programa de ahorro de la CREG (resoluciones 101 120 y 101 126 de 2026), vigente desde septiembre, logre un ahorro del 2 % de la demanda (unos 5 GWh por día): 69,1 %, 6,2 puntos por encima de la CAR.
 
-3. Solo como último recurso, racionamiento programado del 5 %, anunciado y por horarios y sectores (unos 12 GWh por día): 71,4 %, 8,6 puntos por encima de la CAR.
+3. Solo como último recurso, racionamiento programado del 5 %, anunciado y por horarios y sectores (unos 12 GWh por día): 72,7 %, 9,8 puntos por encima de la CAR.
 
-Hoy no se requiere racionamiento: las reservas están 22,8 puntos por encima de la CAR. El escenario muestra que la prioridad es recuperar las térmicas y que el programa de ahorro de la CREG dé resultados, para no tener que llegar a cortes programados.
+Hoy no se requiere racionamiento: las reservas están 22,9 puntos por encima de la CAR. El escenario muestra que la prioridad es recuperar las térmicas y que el programa de ahorro de la CREG dé resultados, para no tener que llegar a cortes programados.
 
 ## ¿La energía está llegando a los usuarios?
 
