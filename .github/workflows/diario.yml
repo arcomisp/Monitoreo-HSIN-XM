@@ -46,10 +46,13 @@ jobs:
           python3 src/diagnostico.py /tmp/xm.json --tablero index.html > reportes/DIAGNOSTICO.html
           python3 src/diagnostico.py /tmp/xm.json --tablero index.html --md > reportes/DIAGNOSTICO.md
 
+      - name: Guardar el histórico del día
+        run: python3 src/archivar.py "$FECHA"
+
       - name: Guardar cambios
         run: |
           git config user.name "xm-bot"
           git config user.email "xm-bot@users.noreply.github.com"
-          git add -A reportes index.html
+          git add -A reportes index.html historico
           git diff --cached --quiet || git commit -m "Datos XM al $FECHA"
           git push
