@@ -103,6 +103,10 @@ table.data th:first-child,table.data td:first-child{text-align:left;font-family:
 .upd{display:flex;align-items:flex-start;gap:8px;margin-top:10px;padding:10px 12px;border:1px solid var(--rule);border-left:4px solid var(--water);border-radius:8px;background:var(--surface);font-size:13.5px;color:var(--ink-2);max-width:72ch}
 .upd i{flex:none;width:8px;height:8px;margin-top:6px;border-radius:50%;background:var(--c3)}
 .upd b{color:var(--ink);font-weight:600}
+.upd-why{margin-top:8px;max-width:72ch;font-size:13.5px;color:var(--ink-2)}
+.upd-why summary{cursor:pointer;color:var(--water);font-weight:500}
+.upd-why ul{margin:8px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px;line-height:1.5}
+.upd-why b{color:var(--ink);font-weight:600}
 .gratis{background:var(--surface);border:1px solid var(--rule);border-left:4px solid var(--c3);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;max-width:72ch}
 .gratis b{color:var(--ink);font-size:15px}
 .gratis span{color:var(--ink-2);font-size:14px}
@@ -165,6 +169,15 @@ footer{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--rule);padd
   <p class="lede">Reserva útil del SIN frente a la Senda de Referencia (Res. CREG 209 de 2020) y la Curva de Administración del Riesgo (CAR), junto con los aportes hídricos medidos contra su media histórica.</p>
   <div class="author"><span>Análisis de <b>Alejandro Aroca</b>, Ingeniero Eléctrico · Consultor y Auditor Senior en Proyectos de Energía</span><a href="https://www.linkedin.com/in/alejandro-aroca-ssecc" target="_blank" rel="noopener">LinkedIn</a></div>
 <p class="upd"><i aria-hidden="true"></i><span><b>Se actualiza automáticamente todos los días</b> con datos oficiales de XM, mediante un sistema inteligente de análisis de datos desarrollado en Python por el Ing. Alejandro Aroca.<span id="upd-corte"></span></span></p>
+<details class="upd-why">
+  <summary>Se actualiza todos los días a las 7:40 a. m. (hora de Colombia). ¿Por qué a esa hora y con el corte del día anterior?</summary>
+  <ul>
+    <li><b>XM publica con un día de rezago.</b> Las cifras de cada día (reservas, aportes, generación) se consolidan después de medianoche y XM las publica en la madrugada o en la mañana del día siguiente. Por eso la página muestra siempre el <b>corte del día anterior</b>: el 10 de octubre, por ejemplo, muestra los datos del 9.</li>
+    <li><b>A las 7:40 a. m. ya están disponibles.</b> Esa hora da margen para que XM termine de publicar y, al mismo tiempo, deja la conclusión del día lista antes de que empiece la jornada de trabajo.</li>
+    <li><b>Se usan siempre las cifras más recientes.</b> XM puede ajustar los datos en los días siguientes. Cada actualización recalcula todo con la última versión publicada.</li>
+    <li><b>Puede tardar unos minutos.</b> La actualización corre en servidores de GitHub y en horas de mucho uso puede empezar con algún retraso. Si a media mañana el corte no ha cambiado, lo más probable es que XM aún no haya publicado.</li>
+  </ul>
+</details>
 </header>
 
 <section class="sec dx" id="conclusion" aria-label="Conclusión del día">
